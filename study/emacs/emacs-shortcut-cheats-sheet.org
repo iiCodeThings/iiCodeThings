@@ -7,3 +7,7 @@
 #+begin_src lisp
 C-c C-e h h
 #+end_src
+
+#+begin_center
+© 2021-2022 road-trip.cc [[https://beian.miit.gov.cn/][京ICP备2022005336号-1]]
+#+end_center
