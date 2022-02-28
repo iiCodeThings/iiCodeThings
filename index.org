@@ -10,13 +10,14 @@
 * Study
 ** Emacs
 *** [[https://github.com/iicodethings/emacs.git][emacs.d]]
-*** Emacs Lisp
+*** Do things with emacs
+1. [[https://www.road-trip.cc/study/emacs/emacs-shortcut-cheats-sheet.html][Emacs shortcut cheats sheet]]
 ** Programming Language
-
+*** Emacs Lisp
 * Work
 ** Solutions
-*** [[https://www.road-trip.cc/pl/python/pip-install-m2crypto-issue.html][pip install m2crypto issue]]
+*** [[https://www.road-trip.cc/pl/python/pip-install-m2crypto-issue.html][pip install m2crypto failed issue]]
 
 #+begin_center
-© 2016-2022 road-trip.cc [[https://beian.miit.gov.cn/][京ICP备2022005336号-1]]
+© 2021-2022 road-trip.cc [[https://beian.miit.gov.cn/][京ICP备2022005336号-1]]
 #+end_center

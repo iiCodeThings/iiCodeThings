@@ -1,0 +1,9 @@
+#+title: Emacs shortcut cheats sheet
+#+author: iiCodeThings
+#+date: 2022-02-28 18:32:00
+
+* Org mode
+1. Export org file to pdf
+#+begin_src lisp
+C-c C-e h h
+#+end_src
