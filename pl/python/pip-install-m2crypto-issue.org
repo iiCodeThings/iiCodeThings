@@ -3,12 +3,17 @@
 #+date: 2022-02-03 10:02:10
 
 * 问题描述
-如果在mac系统上面安装python包，比如：m2crypto等时有报openssl相关的错误时，
+如果在mac系统上面安装python包，比如：m2crypto等时有报openssl相关的错误:
+1. 找不到openssl的头文件
+2. 链接不上openssl的库等
+
+* 解决方案
 可以尝试加上openssl的编译参数。
 #+begin_src shell
   LDFLAGS="-L$(brew --prefix openssl)/lib" CFLAGS="-I$(brew --prefix openssl)/include" SWIG_FEATURES="-I$(brew --prefix openssl)/include" pip install m2crypto
 #+end_src
 
+* 安装依赖
 PS，你可能需要提前安装openssl相关的库：
 #+begin_src shell
   brew install openssl
