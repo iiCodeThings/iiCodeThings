@@ -1,0 +1,13 @@
+#+title: index
+#+author: iiCodeThings
+#+date: 2022-02-28 15:03:12
+
+* Life
+* Study
+** Programming Language
+** Python
+*** [[https://www.road-trip.cc/pl/python/pip-install-m2crypto-issue.html][pip-install-m2crypto-issue]]
+** Go
+** C-C++
+** Rust
+* Work
