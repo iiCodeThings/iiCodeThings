@@ -19,3 +19,7 @@
 #+begin_center
 跑步看心率，不看配速！！！
 #+end_center
+
+#+begin_center
+© 2021-2022 road-trip.cc [[https://beian.miit.gov.cn/][京ICP备2022005336号-1]]
+#+end_center
