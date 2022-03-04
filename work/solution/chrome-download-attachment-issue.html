@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-03-04 Fri 10:56 -->
+<!-- 2022-03-04 Fri 10:57 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -200,13 +200,13 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orga989c1b">1. Question description</a>
+<li><a href="#org244a7ca">1. Question description</a>
 <ul>
-<li><a href="#org11ec8a5">1.1. 参考代码</a></li>
+<li><a href="#org468e1e7">1.1. 参考代码</a></li>
 </ul>
 </li>
-<li><a href="#org01961ea">2. 问题分析</a></li>
-<li><a href="#orgc89b252">3. Resolve solution</a></li>
+<li><a href="#orgfff07b9">2. 问题分析</a></li>
+<li><a href="#org98e0001">3. Resolve solution</a></li>
 </ul>
 </div>
 </div>
@@ -216,8 +216,8 @@
 #+date 2022-03-04
 </p>
 
-<div id="outline-container-orga989c1b" class="outline-2">
-<h2 id="orga989c1b"><span class="section-number-2">1.</span> Question description</h2>
+<div id="outline-container-org244a7ca" class="outline-2">
+<h2 id="org244a7ca"><span class="section-number-2">1.</span> Question description</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 在使用Flask框架做WebApp时，有个导出订单电子表格的需求，一开始实现方式如下：
@@ -228,8 +228,8 @@
 <li>使用访问Flask静态文件的方式实现下载文件</li>
 </ul>
 </div>
-<div id="outline-container-org11ec8a5" class="outline-3">
-<h3 id="org11ec8a5"><span class="section-number-3">1.1.</span> 参考代码</h3>
+<div id="outline-container-org468e1e7" class="outline-3">
+<h3 id="org468e1e7"><span class="section-number-3">1.1.</span> 参考代码</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #ce537a; font-weight: bold;">@admin_blueprint.route</span><span style="color: #4f97d7;">(</span><span style="color: #2d9574;">'/order/export'</span>, methods=<span style="color: #bc6ec5;">[</span><span style="color: #2d9574;">'GET'</span><span style="color: #bc6ec5;">]</span><span style="color: #4f97d7;">)</span>
@@ -245,8 +245,8 @@
 </div>
 </div>
 </div>
-<div id="outline-container-org01961ea" class="outline-2">
-<h2 id="org01961ea"><span class="section-number-2">2.</span> 问题分析</h2>
+<div id="outline-container-orgfff07b9" class="outline-2">
+<h2 id="orgfff07b9"><span class="section-number-2">2.</span> 问题分析</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 TBD&#x2026;
@@ -254,8 +254,8 @@ TBD&#x2026;
 </div>
 </div>
 
-<div id="outline-container-orgc89b252" class="outline-2">
-<h2 id="orgc89b252"><span class="section-number-2">3.</span> Resolve solution</h2>
+<div id="outline-container-org98e0001" class="outline-2">
+<h2 id="org98e0001"><span class="section-number-2">3.</span> Resolve solution</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 参考解决代码：
@@ -265,12 +265,18 @@ TBD&#x2026;
 <span style="color: #4f97d7; font-weight: bold;">return</span> send_from_directory<span style="color: #4f97d7;">(</span><span style="color: #2d9574;">'/data/miniapp_store'</span>, <span style="color: #2d9574;">'orders.xls'</span>, as_attachment=<span style="color: #a45bad;">True</span><span style="color: #4f97d7;">)</span>
 </pre>
 </div>
+
+<div class="org-center">
+<p>
+© 2021-2022 road-trip.cc <a href="https://beian.miit.gov.cn/">京ICP备2022005336号-1</a>
+</p>
+</div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Yunchao Chen</p>
-<p class="date">Created: 2022-03-04 Fri 10:56</p>
+<p class="date">Created: 2022-03-04 Fri 10:57</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
