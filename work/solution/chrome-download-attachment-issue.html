@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-03-04 Fri 10:57 -->
+<!-- 2022-03-04 Fri 11:45 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -200,13 +200,22 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org244a7ca">1. Question description</a>
+<li><a href="#org95d8ea9">1. Question description</a>
 <ul>
-<li><a href="#org468e1e7">1.1. 参考代码</a></li>
+<li><a href="#orgfee5aae">1.1. 参考代码</a></li>
 </ul>
 </li>
-<li><a href="#orgfff07b9">2. 问题分析</a></li>
-<li><a href="#org98e0001">3. Resolve solution</a></li>
+<li><a href="#orga12608e">2. 问题分析</a>
+<ul>
+<li>
+<ul>
+<li><a href="#org7c36250">2.0.1. 来自互联网的一种解释：</a></li>
+<li><a href="#org86b61ef">2.0.2. 实际分析结果</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org51f748e">3. Resolve solution</a></li>
 </ul>
 </div>
 </div>
@@ -216,8 +225,8 @@
 #+date 2022-03-04
 </p>
 
-<div id="outline-container-org244a7ca" class="outline-2">
-<h2 id="org244a7ca"><span class="section-number-2">1.</span> Question description</h2>
+<div id="outline-container-org95d8ea9" class="outline-2">
+<h2 id="org95d8ea9"><span class="section-number-2">1.</span> Question description</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 在使用Flask框架做WebApp时，有个导出订单电子表格的需求，一开始实现方式如下：
@@ -228,8 +237,8 @@
 <li>使用访问Flask静态文件的方式实现下载文件</li>
 </ul>
 </div>
-<div id="outline-container-org468e1e7" class="outline-3">
-<h3 id="org468e1e7"><span class="section-number-3">1.1.</span> 参考代码</h3>
+<div id="outline-container-orgfee5aae" class="outline-3">
+<h3 id="orgfee5aae"><span class="section-number-3">1.1.</span> 参考代码</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #ce537a; font-weight: bold;">@admin_blueprint.route</span><span style="color: #4f97d7;">(</span><span style="color: #2d9574;">'/order/export'</span>, methods=<span style="color: #bc6ec5;">[</span><span style="color: #2d9574;">'GET'</span><span style="color: #bc6ec5;">]</span><span style="color: #4f97d7;">)</span>
@@ -245,17 +254,34 @@
 </div>
 </div>
 </div>
-<div id="outline-container-orgfff07b9" class="outline-2">
-<h2 id="orgfff07b9"><span class="section-number-2">2.</span> 问题分析</h2>
+<div id="outline-container-orga12608e" class="outline-2">
+<h2 id="orga12608e"><span class="section-number-2">2.</span> 问题分析</h2>
 <div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org7c36250" class="outline-4">
+<h4 id="org7c36250"><span class="section-number-4">2.0.1.</span> 来自互联网的一种解释：</h4>
+<div class="outline-text-4" id="text-2-0-1">
+<blockquote>
 <p>
-TBD&#x2026;
+使用谷歌浏览器下载文件名中带有英文半角逗号的文件时，请求已发送，但响应时发生浏览器崩溃现象，
+页面提示 ERR<sub>RESPONSE</sub><sub>HEADERS</sub><sub>MULTIPLE</sub><sub>CONTENT</sub><sub>DISPOSITION</sub> ，其他浏览器无此现象，
+查到是谷歌浏览器特有现象，应该说是一个bug，服务器端函数响应中若设置了 content-disposition http头，
+需要确保filename参数使用双引号包裹。有时 filename* 参数也需要使用双引号括起.
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-org86b61ef" class="outline-4">
+<h4 id="org86b61ef"><span class="section-number-4">2.0.2.</span> 实际分析结果</h4>
+<div class="outline-text-4" id="text-2-0-2">
+<p>
+在flask这个环境下，即使附件文件名里面没有特殊字符也会报如标题所示的错误。需要进一步分析～
 </p>
 </div>
 </div>
-
-<div id="outline-container-org98e0001" class="outline-2">
-<h2 id="org98e0001"><span class="section-number-2">3.</span> Resolve solution</h2>
+</div>
+<div id="outline-container-org51f748e" class="outline-2">
+<h2 id="org51f748e"><span class="section-number-2">3.</span> Resolve solution</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 参考解决代码：
@@ -276,7 +302,7 @@ TBD&#x2026;
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Yunchao Chen</p>
-<p class="date">Created: 2022-03-04 Fri 10:57</p>
+<p class="date">Created: 2022-03-04 Fri 11:45</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

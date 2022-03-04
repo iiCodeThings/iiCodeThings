@@ -17,8 +17,15 @@
 
 在使用Chrome下载时回报如title所示的错误。
 * 问题分析
-TBD...
-
+*** 来自互联网的一种解释：
+#+begin_quote
+使用谷歌浏览器下载文件名中带有英文半角逗号的文件时，请求已发送，但响应时发生浏览器崩溃现象，
+页面提示 ERR_RESPONSE_HEADERS_MULTIPLE_CONTENT_DISPOSITION ，其他浏览器无此现象，
+查到是谷歌浏览器特有现象，应该说是一个bug，服务器端函数响应中若设置了 content-disposition http头，
+需要确保filename参数使用双引号包裹。有时 filename* 参数也需要使用双引号括起.
+#+end_quote
+*** 实际分析结果
+在flask这个环境下，即使附件文件名里面没有特殊字符也会报如标题所示的错误。需要进一步分析～
 * Resolve solution
 参考解决代码：
 #+begin_src python
