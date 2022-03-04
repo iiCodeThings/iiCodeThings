@@ -1,0 +1,27 @@
+#+title ERR_RESPONSE_HEADERS_MULTIPLE_CONTENT_DISPOSITION
+#+author iiCodeThings
+#+date 2022-03-04
+
+* Question description
+在使用Flask框架做WebApp时，有个导出订单电子表格的需求，一开始实现方式如下：
++ 当收到导出request的时候生成订单电子表格文件
++ 将电子表格文件存放到Flask的static目录里面
++ 使用访问Flask静态文件的方式实现下载文件
+** 参考代码
+#+begin_src python
+  @admin_blueprint.route('/order/export', methods=['GET'])
+  @login_required
+  def admin_order_export():
+      return redirect(url_for('static', filename='订单.xls'))
+#+end_src
+
+在使用Chrome下载时回报如title所示的错误。
+* 问题分析
+TBD...
+
+* Resolve solution
+参考解决代码：
+#+begin_src python
+  from flask import send_from_directory
+  return send_from_directory('/data/miniapp_store', 'orders.xls', as_attachment=True)
+#+end_src
