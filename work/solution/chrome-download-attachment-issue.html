@@ -3,14 +3,14 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-03-04 Fri 11:45 -->
+<!-- 2022-03-08 Tue 10:16 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
+<meta name="generator" content="Org mode" />
 <meta name="author" content="Yunchao Chen" />
-<meta name="generator" content="Org Mode" />
-<style>
-  #content { max-width: 60em; margin: auto; }
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center;
              margin-bottom: .2em; }
   .subtitle { text-align: center;
@@ -31,9 +31,8 @@
   #postamble p, #preamble p { font-size: 90%; margin: .2em; }
   p.verse { margin-left: 3%; }
   pre {
-    border: 1px solid #e6e6e6;
-    border-radius: 3px;
-    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
     padding: 8pt;
     font-family: monospace;
     overflow: auto;
@@ -42,21 +41,21 @@
   pre.src {
     position: relative;
     overflow: auto;
+    padding-top: 1.2em;
   }
   pre.src:before {
     display: none;
     position: absolute;
-    top: -8px;
-    right: 12px;
+    background-color: white;
+    top: -10px;
+    right: 10px;
     padding: 3px;
-    color: #555;
-    background-color: #f2f2f299;
+    border: 1px solid black;
   }
   pre.src:hover:before { display: inline; margin-top: 14px;}
   /* Languages per Org manual */
   pre.src-asymptote:before { content: 'Asymptote'; }
   pre.src-awk:before { content: 'Awk'; }
-  pre.src-authinfo::before { content: 'Authinfo'; }
   pre.src-C:before { content: 'C'; }
   /* pre.src-C++ doesn't work in CSS */
   pre.src-clojure:before { content: 'Clojure'; }
@@ -192,30 +191,53 @@
   .org-info-js_search-highlight
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { width: 90%; }
+  /*]]>*/-->
 </style>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
 </head>
 <body>
-<div id="content" class="content">
-<div id="table-of-contents" role="doc-toc">
+<div id="content">
+<div id="table-of-contents">
 <h2>Table of Contents</h2>
-<div id="text-table-of-contents" role="doc-toc">
+<div id="text-table-of-contents">
 <ul>
-<li><a href="#org95d8ea9">1. Question description</a>
+<li><a href="#orgcd8bdc9">1. Question description</a>
 <ul>
-<li><a href="#orgfee5aae">1.1. 参考代码</a></li>
+<li><a href="#orgad21a1c">1.1. 参考代码</a></li>
 </ul>
 </li>
-<li><a href="#orga12608e">2. 问题分析</a>
+<li><a href="#org13be17a">2. 问题分析</a>
 <ul>
 <li>
 <ul>
-<li><a href="#org7c36250">2.0.1. 来自互联网的一种解释：</a></li>
-<li><a href="#org86b61ef">2.0.2. 实际分析结果</a></li>
+<li><a href="#orgfae99ad">2.0.1. 来自互联网的一种解释：</a></li>
+<li><a href="#orgc709009">2.0.2. 实际分析结果</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org51f748e">3. Resolve solution</a></li>
+<li><a href="#org076cb89">3. Resolve solution</a></li>
 </ul>
 </div>
 </div>
@@ -225,8 +247,8 @@
 #+date 2022-03-04
 </p>
 
-<div id="outline-container-org95d8ea9" class="outline-2">
-<h2 id="org95d8ea9"><span class="section-number-2">1.</span> Question description</h2>
+<div id="outline-container-orgcd8bdc9" class="outline-2">
+<h2 id="orgcd8bdc9"><span class="section-number-2">1</span> Question description</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 在使用Flask框架做WebApp时，有个导出订单电子表格的需求，一开始实现方式如下：
@@ -237,14 +259,14 @@
 <li>使用访问Flask静态文件的方式实现下载文件</li>
 </ul>
 </div>
-<div id="outline-container-orgfee5aae" class="outline-3">
-<h3 id="orgfee5aae"><span class="section-number-3">1.1.</span> 参考代码</h3>
+<div id="outline-container-orgad21a1c" class="outline-3">
+<h3 id="orgad21a1c"><span class="section-number-3">1.1</span> 参考代码</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ce537a; font-weight: bold;">@admin_blueprint.route</span><span style="color: #4f97d7;">(</span><span style="color: #2d9574;">'/order/export'</span>, methods=<span style="color: #bc6ec5;">[</span><span style="color: #2d9574;">'GET'</span><span style="color: #bc6ec5;">]</span><span style="color: #4f97d7;">)</span>
-<span style="color: #ce537a; font-weight: bold;">@login_required</span>
-<span style="color: #4f97d7; font-weight: bold;">def</span> <span style="color: #bc6ec5; font-weight: bold;">admin_order_export</span><span style="color: #4f97d7;">()</span>:
-    <span style="color: #4f97d7; font-weight: bold;">return</span> redirect<span style="color: #4f97d7;">(</span>url_for<span style="color: #bc6ec5;">(</span><span style="color: #2d9574;">'static'</span>, filename=<span style="color: #2d9574;">'&#35746;&#21333;.xls'</span><span style="color: #bc6ec5;">)</span><span style="color: #4f97d7;">)</span>
+<pre class="src src-python">@admin_blueprint.route('/order/export', methods=['GET'])
+@login_required
+def admin_order_export():
+    return redirect(url_for('static', filename='订单.xls'))
 </pre>
 </div>
 
@@ -254,12 +276,12 @@
 </div>
 </div>
 </div>
-<div id="outline-container-orga12608e" class="outline-2">
-<h2 id="orga12608e"><span class="section-number-2">2.</span> 问题分析</h2>
+<div id="outline-container-org13be17a" class="outline-2">
+<h2 id="org13be17a"><span class="section-number-2">2</span> 问题分析</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org7c36250" class="outline-4">
-<h4 id="org7c36250"><span class="section-number-4">2.0.1.</span> 来自互联网的一种解释：</h4>
+<div id="outline-container-orgfae99ad" class="outline-4">
+<h4 id="orgfae99ad"><span class="section-number-4">2.0.1</span> 来自互联网的一种解释：</h4>
 <div class="outline-text-4" id="text-2-0-1">
 <blockquote>
 <p>
@@ -271,8 +293,8 @@
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org86b61ef" class="outline-4">
-<h4 id="org86b61ef"><span class="section-number-4">2.0.2.</span> 实际分析结果</h4>
+<div id="outline-container-orgc709009" class="outline-4">
+<h4 id="orgc709009"><span class="section-number-4">2.0.2</span> 实际分析结果</h4>
 <div class="outline-text-4" id="text-2-0-2">
 <p>
 在flask这个环境下，即使附件文件名里面没有特殊字符也会报如标题所示的错误。需要进一步分析～
@@ -280,21 +302,21 @@
 </div>
 </div>
 </div>
-<div id="outline-container-org51f748e" class="outline-2">
-<h2 id="org51f748e"><span class="section-number-2">3.</span> Resolve solution</h2>
+<div id="outline-container-org076cb89" class="outline-2">
+<h2 id="org076cb89"><span class="section-number-2">3</span> Resolve solution</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 参考解决代码：
 </p>
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #4f97d7; font-weight: bold;">from</span> flask <span style="color: #4f97d7; font-weight: bold;">import</span> send_from_directory
-<span style="color: #4f97d7; font-weight: bold;">return</span> send_from_directory<span style="color: #4f97d7;">(</span><span style="color: #2d9574;">'/data/miniapp_store'</span>, <span style="color: #2d9574;">'orders.xls'</span>, as_attachment=<span style="color: #a45bad;">True</span><span style="color: #4f97d7;">)</span>
+<pre class="src src-python">from flask import send_from_directory
+return send_from_directory('/data/miniapp_store', 'orders.xls', as_attachment=True)
 </pre>
 </div>
 
 <div class="org-center">
 <p>
-© 2021-2022 road-trip.cc <a href="https://beian.miit.gov.cn/">京ICP备2022005336号-1</a>
+© 2021-2022 road-trip.cc <a href="https://beian.miit.gov.cn/">京ICP备2022005336号-1</a> <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11011402012380">京公安网备11011402012380</a>
 </p>
 </div>
 </div>
@@ -302,7 +324,7 @@
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Yunchao Chen</p>
-<p class="date">Created: 2022-03-04 Fri 11:45</p>
+<p class="date">Created: 2022-03-08 Tue 10:16</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

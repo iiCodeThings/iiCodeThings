@@ -34,5 +34,5 @@
 #+end_src
 
 #+begin_center
-© 2021-2022 road-trip.cc [[https://beian.miit.gov.cn/][京ICP备2022005336号-1]]
+© 2021-2022 road-trip.cc [[https://beian.miit.gov.cn/][京ICP备2022005336号-1]] [[http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11011402012380][京公安网备11011402012380]]
 #+end_center
