@@ -18,6 +18,7 @@
 ** Solutions
 *** [[https://www.road-trip.cc/pl/python/pip-install-m2crypto-issue.html][pip install m2crypto failed issue]]
 *** [[https://www.road-trip.cc/work/solution/chrome-download-attachment-issue.html][ERR_RESPONSE_HEADERS_MULTIPLE_CONTENT_DISPOSITION]]
+*** [[https://www.road-trip.cc/work/sulution/update-py3-virtualenv-pip-version.html][Update python3's virtualenv pip's version]]
 #+begin_center
 © 2021-2022 road-trip.cc [[https://beian.miit.gov.cn/][京ICP备2022005336号-1]] [[http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11011402012380][京公安网备11011402012380]]
 #+end_center

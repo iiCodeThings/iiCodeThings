@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-03-10 Thu 14:45 -->
+<!-- 2022-03-10 Thu 14:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Welcome</title>
+<title>Update python3's virtualenv pip's version</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="iiCodeThings" />
 <style type="text/css">
@@ -218,116 +218,218 @@
 </head>
 <body>
 <div id="content">
-<h1 class="title">Welcome
-<br />
-<span class="subtitle">Powered by Org mode with emacs</span>
-</h1>
+<h1 class="title">Update python3's virtualenv pip's version</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9fe0590">1. Life</a>
+<li><a href="#orgb81e90e">1. 发现问题</a>
 <ul>
-<li><a href="#orgc22e7f4">1.1. Sport Summary</a>
-<ul>
-<li><a href="#org551e175">1.1.1. Science of Running</a></li>
-<li><a href="#org1d8bd89">1.1.2. Running Summary-202202</a></li>
+<li><a href="#org637bb60">1.1. pip</a></li>
+<li><a href="#org14e0a88">1.2. venv</a></li>
+<li><a href="#orgafae847">1.3. 一些信息</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#orgbd680f8">2. Study</a>
+<li><a href="#orgab97855">2. 分析问题</a>
 <ul>
-<li><a href="#org2aa777a">2.1. Emacs</a>
-<ul>
-<li><a href="#org989cc3a">2.1.1. emacs.d</a></li>
-<li><a href="#org00dced1">2.1.2. Do things with emacs</a></li>
+<li><a href="#org12acaaa">2.1. 升级系统pip版本后，再次创建完虚拟环境能否解决？</a></li>
+<li><a href="#orga6242b9">2.2. 仔细分析/观察/合理猜想/积极实验</a></li>
+<li><a href="#org41c8d15">2.3. 研究pip</a></li>
+<li><a href="#org4339d44">2.4. 更好的解决办法</a></li>
+<li><a href="#org9da2a6f">2.5. 问题好像解决了？</a></li>
+<li><a href="#orgc58b846">2.6. 回归本源</a></li>
 </ul>
 </li>
-<li><a href="#org817ee7a">2.2. Programming Language</a>
-<ul>
-<li><a href="#org68d33e4">2.2.1. Emacs Lisp</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org0af1e47">3. Work</a>
-<ul>
-<li><a href="#orgdcc95ec">3.1. Solutions</a>
-<ul>
-<li><a href="#orgf942795">3.1.1. pip install m2crypto failed issue</a></li>
-<li><a href="#org8f53dfc">3.1.2. ERR<sub>RESPONSE</sub><sub>HEADERS</sub><sub>MULTIPLE</sub><sub>CONTENT</sub><sub>DISPOSITION</sub></a></li>
-<li><a href="#orgebf3c1a">3.1.3. Update python3's virtualenv pip's version</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a href="#org3ab0eda">3. 解决方案</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org9fe0590" class="outline-2">
-<h2 id="org9fe0590"><span class="section-number-2">1</span> Life</h2>
+<div id="outline-container-orgb81e90e" class="outline-2">
+<h2 id="orgb81e90e"><span class="section-number-2">1</span> 发现问题</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgc22e7f4" class="outline-3">
-<h3 id="orgc22e7f4"><span class="section-number-3">1.1</span> Sport Summary</h3>
+<div id="outline-container-org637bb60" class="outline-3">
+<h3 id="org637bb60"><span class="section-number-3">1.1</span> pip</h3>
 <div class="outline-text-3" id="text-1-1">
+<p>
+python内置了pip模块，可以不用使用独立的pip工具安装python包。
+#+begin<sub>src</sub> shell
+$ python3 -m pip &#x2013;version
+#end<sub>src</sub>
+</p>
 </div>
-<div id="outline-container-org551e175" class="outline-4">
-<h4 id="org551e175"><span class="section-number-4">1.1.1</span> <a href="https://www.road-trip.cc/life/sport/science-of-running.html">Science of Running</a></h4>
 </div>
-<div id="outline-container-org1d8bd89" class="outline-4">
-<h4 id="org1d8bd89"><span class="section-number-4">1.1.2</span> <a href="https://www.road-trip.cc/life/sport/running-summary-202202.html">Running Summary-202202</a></h4>
+
+<div id="outline-container-org14e0a88" class="outline-3">
+<h3 id="org14e0a88"><span class="section-number-3">1.2</span> venv</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+现在安装python库时，为了区隔项目，一般会使用虚拟环境（virtualenv）这一技术。
+Python3直接提供了venv模块，可以很方便的创建虚拟环境。
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ python3 -m venv venv
+</pre>
+</div>
+
+<p>
+在某次工作中，安装python包时并没有安装合适当前系统的包，pip模块下载的bz2的代码包去编译安装。
+于是升级pip到最新版本，这时候再次安装依赖包就能安装预编译好的包了。
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -U pip
+$ pip --version
+</pre>
+</div>
+
+<p>
+在其它的项目中创建新的虚拟环境时，发现pip的版本还是老的？Why？
+</p>
+</div>
+</div>
+<div id="outline-container-orgafae847" class="outline-3">
+<h3 id="orgafae847"><span class="section-number-3">1.3</span> 一些信息</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+老的pip version：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">pip 20.2.3 from /Users/user/tmp/venv/lib/python3.8/site-packages/pip (python 3.8)
+</pre>
+</div>
+
+<p>
+当前最新的pip version：
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">pip 22.0.4 from /Users/user/Library/Python/3.8/lib/python/site-packages/pip (python 3.8)
+</pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgbd680f8" class="outline-2">
-<h2 id="orgbd680f8"><span class="section-number-2">2</span> Study</h2>
+</div>
+
+<div id="outline-container-orgab97855" class="outline-2">
+<h2 id="orgab97855"><span class="section-number-2">2</span> 分析问题</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org2aa777a" class="outline-3">
-<h3 id="org2aa777a"><span class="section-number-3">2.1</span> Emacs</h3>
+<div id="outline-container-org12acaaa" class="outline-3">
+<h3 id="org12acaaa"><span class="section-number-3">2.1</span> 升级系统pip版本后，再次创建完虚拟环境能否解决？</h3>
 <div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-shell">$ python3 -m pip install -u pip
+</pre>
 </div>
-<div id="outline-container-org989cc3a" class="outline-4">
-<h4 id="org989cc3a"><span class="section-number-4">2.1.1</span> <a href="https://github.com/iicodethings/emacs.git">emacs.d</a></h4>
-</div>
-<div id="outline-container-org00dced1" class="outline-4">
-<h4 id="org00dced1"><span class="section-number-4">2.1.2</span> Do things with emacs</h4>
-<div class="outline-text-4" id="text-2-1-2">
-<ol class="org-ol">
-<li><a href="https://www.road-trip.cc/study/emacs/emacs-shortcut-cheats-sheet.html">Emacs shortcut cheats sheet</a></li>
-</ol>
+<p>
+实际测试，问题没有解决！
+</p>
 </div>
 </div>
-</div>
-<div id="outline-container-org817ee7a" class="outline-3">
-<h3 id="org817ee7a"><span class="section-number-3">2.2</span> Programming Language</h3>
+
+<div id="outline-container-orga6242b9" class="outline-3">
+<h3 id="orga6242b9"><span class="section-number-3">2.2</span> 仔细分析/观察/合理猜想/积极实验</h3>
 <div class="outline-text-3" id="text-2-2">
+<p>
+#+begin<sub>src</sub> shell
+$ python3 -m pip &#x2013;version
+$ pip 22.0.4 from /Users/ycchen/Library/Python/3.8/lib/python/site-packages/pip (python 3.8)
+#end<sub>src</sub>
+</p>
+
+<p>
+#+begin<sub>src</sub> shell
+$ .venv/bin/pip &#x2013;version
+pip 20.2.3 from /Users/ycchen/venv/lib/python3.8/site-packages/pip (python 3.8)
+#end<sub>src</sub>
+</p>
+
+<p>
+两者输出的路径并一样，说明各有各的site-packages，如果让虚拟环境里面的site-package使用系统的，是不是可以解决问题？
+</p>
 </div>
-<div id="outline-container-org68d33e4" class="outline-4">
-<h4 id="org68d33e4"><span class="section-number-4">2.2.1</span> Emacs Lisp</h4>
+</div>
+<div id="outline-container-org41c8d15" class="outline-3">
+<h3 id="org41c8d15"><span class="section-number-3">2.3</span> 研究pip</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+pip并不是一个二进制程序，其实是一个python script，修改其虚拟环境的pip的sys path：
+#+begin<sub>+src</sub> python
+#!/Users/ycchen/tmp/venv/bin/python3
+</p>
+
+<p>
+import re
+import sys
+</p>
+<ul class="org-ul">
+<li>sys.path.insert(0, '/Users/ycchen/Library/Python/3.8/lib/python/site-packages')</li>
+</ul>
+<p>
+from pip.<sub>internal.cli.main</sub> import main
+if <span class="underline"><span class="underline">name</span></span> == '<span class="underline"><span class="underline">main</span></span>':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
+#+end<sub>src</sub>
+</p>
+
+<p>
+问题可以解决。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4339d44" class="outline-3">
+<h3 id="org4339d44"><span class="section-number-3">2.4</span> 更好的解决办法</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+通过修改pip代码来使用最新版本的pip显然不是一个好办法。通过搜索python docs，发现了一个python的环境变量：PYTHONPATH
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ export PYTHONPATH=/Users/ycchen/Library/Python/3.8/lib/python/site-packages:$PYTHONPATH
+</pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org0af1e47" class="outline-2">
-<h2 id="org0af1e47"><span class="section-number-2">3</span> Work</h2>
+
+<div id="outline-container-org9da2a6f" class="outline-3">
+<h3 id="org9da2a6f"><span class="section-number-3">2.5</span> 问题好像解决了？</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+在后续的使用发现，以上这种解决方案的弊端是虚拟环境的概念没有了，虽然使用虚拟环境的pip，但是安装python包回安装在系统site-packages里面。
+没有起到区隔的作用。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc58b846" class="outline-3">
+<h3 id="orgc58b846"><span class="section-number-3">2.6</span> 回归本源</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+去python官网看documents，找到了线索：
+</p>
+
+<p>
+参考link：<a href="https://docs.python.org/3/library/venv.html">python venv
+</a>
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3ab0eda" class="outline-2">
+<h2 id="org3ab0eda"><span class="section-number-2">3</span> 解决方案</h2>
 <div class="outline-text-2" id="text-3">
-</div>
-<div id="outline-container-orgdcc95ec" class="outline-3">
-<h3 id="orgdcc95ec"><span class="section-number-3">3.1</span> Solutions</h3>
-<div class="outline-text-3" id="text-3-1">
-</div>
-<div id="outline-container-orgf942795" class="outline-4">
-<h4 id="orgf942795"><span class="section-number-4">3.1.1</span> <a href="https://www.road-trip.cc/pl/python/pip-install-m2crypto-issue.html">pip install m2crypto failed issue</a></h4>
-</div>
-<div id="outline-container-org8f53dfc" class="outline-4">
-<h4 id="org8f53dfc"><span class="section-number-4">3.1.2</span> <a href="https://www.road-trip.cc/work/solution/chrome-download-attachment-issue.html">ERR<sub>RESPONSE</sub><sub>HEADERS</sub><sub>MULTIPLE</sub><sub>CONTENT</sub><sub>DISPOSITION</sub></a></h4>
-</div>
-<div id="outline-container-orgebf3c1a" class="outline-4">
-<h4 id="orgebf3c1a"><span class="section-number-4">3.1.3</span> <a href="https://www.road-trip.cc/work/sulution/update-py3-virtualenv-pip-version.html">Update python3's virtualenv pip's version</a></h4>
-<div class="outline-text-4" id="text-3-1-3">
+<ul class="org-ul">
+<li>升级python到3.9</li>
+<li>增加&#x2013;upgrade-deps参数</li>
+</ul>
+
+<p>
+TBD：待测试
+</p>
+
 <div class="org-center">
 <p>
 © 2021-2022 road-trip.cc <a href="https://beian.miit.gov.cn/">京ICP备2022005336号-1</a> <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11011402012380">京公安网备11011402012380</a>
@@ -336,12 +438,10 @@
 </div>
 </div>
 </div>
-</div>
-</div>
 <div id="postamble" class="status">
-<p class="date">Date: 2022-02-28 15:03:12</p>
+<p class="date">Date: 2022-03-10 13:58</p>
 <p class="author">Author: iiCodeThings</p>
-<p class="date">Created: 2022-03-10 Thu 14:45</p>
+<p class="date">Created: 2022-03-10 Thu 14:44</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

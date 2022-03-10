@@ -1,0 +1,102 @@
+#+title: Update python3's virtualenv pip's version
+#+author: iiCodeThings
+#+date: 2022-03-10 13:58
+
+* 发现问题
+
+** pip
+python内置了pip模块，可以不用使用独立的pip工具安装python包。
+#+begin_src shell
+$ python3 -m pip --version
+#end_src
+
+** venv
+现在安装python库时，为了区隔项目，一般会使用虚拟环境（virtualenv）这一技术。
+Python3直接提供了venv模块，可以很方便的创建虚拟环境。
+#+begin_src  shell
+$ python3 -m venv venv
+#+end_src
+
+在某次工作中，安装python包时并没有安装合适当前系统的包，pip模块下载的bz2的代码包去编译安装。
+于是升级pip到最新版本，这时候再次安装依赖包就能安装预编译好的包了。
+#+begin_src shell
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -U pip
+$ pip --version
+#+end_src
+
+在其它的项目中创建新的虚拟环境时，发现pip的版本还是老的？Why？
+** 一些信息
+老的pip version：
+#+begin_src shell
+pip 20.2.3 from /Users/user/tmp/venv/lib/python3.8/site-packages/pip (python 3.8)
+#+end_src
+
+当前最新的pip version：
+#+begin_src shell
+pip 22.0.4 from /Users/user/Library/Python/3.8/lib/python/site-packages/pip (python 3.8)
+#+end_src
+
+* 分析问题
+** 升级系统pip版本后，再次创建完虚拟环境能否解决？
+#+begin_src shell
+$ python3 -m pip install -u pip
+#+end_src
+实际测试，问题没有解决！
+
+** 仔细分析/观察/合理猜想/积极实验
+#+begin_src shell
+$ python3 -m pip --version
+$ pip 22.0.4 from /Users/ycchen/Library/Python/3.8/lib/python/site-packages/pip (python 3.8)
+#end_src
+
+#+begin_src shell
+$ .venv/bin/pip --version
+pip 20.2.3 from /Users/ycchen/venv/lib/python3.8/site-packages/pip (python 3.8)
+#end_src
+
+两者输出的路径并一样，说明各有各的site-packages，如果让虚拟环境里面的site-package使用系统的，是不是可以解决问题？
+** 研究pip
+pip并不是一个二进制程序，其实是一个python script，修改其虚拟环境的pip的sys path：
+#+begin_+src python
+#!/Users/ycchen/tmp/venv/bin/python3
+# -*- coding: utf-8 -*-
+import re
+import sys
++ sys.path.insert(0, '/Users/ycchen/Library/Python/3.8/lib/python/site-packages')
+from pip._internal.cli.main import main
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
+#+end_src
+
+问题可以解决。
+
+** 更好的解决办法
+通过修改pip代码来使用最新版本的pip显然不是一个好办法。通过搜索python docs，发现了一个python的环境变量：PYTHONPATH
+#+begin_src shell
+$ export PYTHONPATH=/Users/ycchen/Library/Python/3.8/lib/python/site-packages:$PYTHONPATH
+#+end_Src
+
+** 问题好像解决了？
+在后续的使用发现，以上这种解决方案的弊端是虚拟环境的概念没有了，虽然使用虚拟环境的pip，但是安装python包回安装在系统site-packages里面。
+没有起到区隔的作用。
+
+** 回归本源
+去python官网看documents，找到了线索：
+#+begin_comment
+Changed in version 3.9: Add --upgrade-deps option to upgrade pip + setuptools to the latest on PyPI
+#+end_comment
+参考link：[[https://docs.python.org/3/library/venv.html][python venv
+]]
+* 解决方案
++ 升级python到3.9
++ 增加--upgrade-deps参数
+
+TBD：待测试
+
+#+begin_center
+© 2021-2022 road-trip.cc [[https://beian.miit.gov.cn/][京ICP备2022005336号-1]] [[http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11011402012380][京公安网备11011402012380]]
+#+end_center
+
