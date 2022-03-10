@@ -48,23 +48,23 @@ $ python3 -m pip install -u pip
 ** 仔细分析/观察/合理猜想/积极实验
 #+begin_src shell
 $ python3 -m pip --version
-$ pip 22.0.4 from /Users/ycchen/Library/Python/3.8/lib/python/site-packages/pip (python 3.8)
+$ pip 22.0.4 from /Users/user/Library/Python/3.8/lib/python/site-packages/pip (python 3.8)
 #end_src
 
 #+begin_src shell
 $ .venv/bin/pip --version
-pip 20.2.3 from /Users/ycchen/venv/lib/python3.8/site-packages/pip (python 3.8)
+pip 20.2.3 from /Users/user/venv/lib/python3.8/site-packages/pip (python 3.8)
 #end_src
 
 两者输出的路径并一样，说明各有各的site-packages，如果让虚拟环境里面的site-package使用系统的，是不是可以解决问题？
 ** 研究pip
 pip并不是一个二进制程序，其实是一个python script，修改其虚拟环境的pip的sys path：
 #+begin_+src python
-#!/Users/ycchen/tmp/venv/bin/python3
+#!/Users/user/tmp/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
-+ sys.path.insert(0, '/Users/ycchen/Library/Python/3.8/lib/python/site-packages')
++ sys.path.insert(0, '/Users/user/Library/Python/3.8/lib/python/site-packages')
 from pip._internal.cli.main import main
 if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 ** 更好的解决办法
 通过修改pip代码来使用最新版本的pip显然不是一个好办法。通过搜索python docs，发现了一个python的环境变量：PYTHONPATH
 #+begin_src shell
-$ export PYTHONPATH=/Users/ycchen/Library/Python/3.8/lib/python/site-packages:$PYTHONPATH
+$ export PYTHONPATH=/Users/user/Library/Python/3.8/lib/python/site-packages:$PYTHONPATH
 #+end_Src
 
 ** 问题好像解决了？

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-03-10 Thu 14:48 -->
+<!-- 2022-03-10 Thu 14:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Update python3's virtualenv pip's version</title>
@@ -223,34 +223,34 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org6fcf28d">1. 发现问题</a>
+<li><a href="#org80bce2a">1. 发现问题</a>
 <ul>
-<li><a href="#org00bec8d">1.1. pip</a></li>
-<li><a href="#orgc411bbf">1.2. venv</a></li>
-<li><a href="#org3d89938">1.3. 一些信息</a></li>
+<li><a href="#org52f8b9d">1.1. pip</a></li>
+<li><a href="#org48b81ea">1.2. venv</a></li>
+<li><a href="#org64ee526">1.3. 一些信息</a></li>
 </ul>
 </li>
-<li><a href="#org4a08789">2. 分析问题</a>
+<li><a href="#org6ce6b98">2. 分析问题</a>
 <ul>
-<li><a href="#org234d60a">2.1. 升级系统pip版本后，再次创建完虚拟环境能否解决？</a></li>
-<li><a href="#org14a9be3">2.2. 仔细分析/观察/合理猜想/积极实验</a></li>
-<li><a href="#org56db1bf">2.3. 研究pip</a></li>
-<li><a href="#orgb8ea0be">2.4. 更好的解决办法</a></li>
-<li><a href="#orgd341fa9">2.5. 问题好像解决了？</a></li>
-<li><a href="#org222760a">2.6. 回归本源</a></li>
+<li><a href="#orgf69d334">2.1. 升级系统pip版本后，再次创建完虚拟环境能否解决？</a></li>
+<li><a href="#orgfa49b21">2.2. 仔细分析/观察/合理猜想/积极实验</a></li>
+<li><a href="#org5479dc9">2.3. 研究pip</a></li>
+<li><a href="#org159c7b7">2.4. 更好的解决办法</a></li>
+<li><a href="#orga51a1b9">2.5. 问题好像解决了？</a></li>
+<li><a href="#orgc5c8117">2.6. 回归本源</a></li>
 </ul>
 </li>
-<li><a href="#org43abf0f">3. 解决方案</a></li>
+<li><a href="#org61d199a">3. 解决方案</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org6fcf28d" class="outline-2">
-<h2 id="org6fcf28d"><span class="section-number-2">1</span> 发现问题</h2>
+<div id="outline-container-org80bce2a" class="outline-2">
+<h2 id="org80bce2a"><span class="section-number-2">1</span> 发现问题</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org00bec8d" class="outline-3">
-<h3 id="org00bec8d"><span class="section-number-3">1.1</span> pip</h3>
+<div id="outline-container-org52f8b9d" class="outline-3">
+<h3 id="org52f8b9d"><span class="section-number-3">1.1</span> pip</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 python内置了pip模块，可以不用使用独立的pip工具安装python包。
@@ -261,8 +261,8 @@ $ python3 -m pip &#x2013;version
 </div>
 </div>
 
-<div id="outline-container-orgc411bbf" class="outline-3">
-<h3 id="orgc411bbf"><span class="section-number-3">1.2</span> venv</h3>
+<div id="outline-container-org48b81ea" class="outline-3">
+<h3 id="org48b81ea"><span class="section-number-3">1.2</span> venv</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 现在安装python库时，为了区隔项目，一般会使用虚拟环境（virtualenv）这一技术。
@@ -290,8 +290,8 @@ $ pip --version
 </p>
 </div>
 </div>
-<div id="outline-container-org3d89938" class="outline-3">
-<h3 id="org3d89938"><span class="section-number-3">1.3</span> 一些信息</h3>
+<div id="outline-container-org64ee526" class="outline-3">
+<h3 id="org64ee526"><span class="section-number-3">1.3</span> 一些信息</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 老的pip version：
@@ -312,12 +312,12 @@ $ pip --version
 </div>
 </div>
 
-<div id="outline-container-org4a08789" class="outline-2">
-<h2 id="org4a08789"><span class="section-number-2">2</span> 分析问题</h2>
+<div id="outline-container-org6ce6b98" class="outline-2">
+<h2 id="org6ce6b98"><span class="section-number-2">2</span> 分析问题</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org234d60a" class="outline-3">
-<h3 id="org234d60a"><span class="section-number-3">2.1</span> 升级系统pip版本后，再次创建完虚拟环境能否解决？</h3>
+<div id="outline-container-orgf69d334" class="outline-3">
+<h3 id="orgf69d334"><span class="section-number-3">2.1</span> 升级系统pip版本后，再次创建完虚拟环境能否解决？</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-shell">$ python3 -m pip install -u pip
@@ -329,20 +329,20 @@ $ pip --version
 </div>
 </div>
 
-<div id="outline-container-org14a9be3" class="outline-3">
-<h3 id="org14a9be3"><span class="section-number-3">2.2</span> 仔细分析/观察/合理猜想/积极实验</h3>
+<div id="outline-container-orgfa49b21" class="outline-3">
+<h3 id="orgfa49b21"><span class="section-number-3">2.2</span> 仔细分析/观察/合理猜想/积极实验</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 #+begin<sub>src</sub> shell
 $ python3 -m pip &#x2013;version
-$ pip 22.0.4 from /Users/ycchen/Library/Python/3.8/lib/python/site-packages/pip (python 3.8)
+$ pip 22.0.4 from /Users/user/Library/Python/3.8/lib/python/site-packages/pip (python 3.8)
 #end<sub>src</sub>
 </p>
 
 <p>
 #+begin<sub>src</sub> shell
 $ .venv/bin/pip &#x2013;version
-pip 20.2.3 from /Users/ycchen/venv/lib/python3.8/site-packages/pip (python 3.8)
+pip 20.2.3 from /Users/user/venv/lib/python3.8/site-packages/pip (python 3.8)
 #end<sub>src</sub>
 </p>
 
@@ -351,13 +351,13 @@ pip 20.2.3 from /Users/ycchen/venv/lib/python3.8/site-packages/pip (python 3.8)
 </p>
 </div>
 </div>
-<div id="outline-container-org56db1bf" class="outline-3">
-<h3 id="org56db1bf"><span class="section-number-3">2.3</span> 研究pip</h3>
+<div id="outline-container-org5479dc9" class="outline-3">
+<h3 id="org5479dc9"><span class="section-number-3">2.3</span> 研究pip</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 pip并不是一个二进制程序，其实是一个python script，修改其虚拟环境的pip的sys path：
 #+begin<sub>+src</sub> python
-#!/Users/ycchen/tmp/venv/bin/python3
+#!/Users/user/tmp/venv/bin/python3
 </p>
 
 <p>
@@ -365,7 +365,7 @@ import re
 import sys
 </p>
 <ul class="org-ul">
-<li>sys.path.insert(0, '/Users/ycchen/Library/Python/3.8/lib/python/site-packages')</li>
+<li>sys.path.insert(0, '/Users/user/Library/Python/3.8/lib/python/site-packages')</li>
 </ul>
 <p>
 from pip.<sub>internal.cli.main</sub> import main
@@ -381,21 +381,21 @@ if <span class="underline"><span class="underline">name</span></span> == '<span 
 </div>
 </div>
 
-<div id="outline-container-orgb8ea0be" class="outline-3">
-<h3 id="orgb8ea0be"><span class="section-number-3">2.4</span> 更好的解决办法</h3>
+<div id="outline-container-org159c7b7" class="outline-3">
+<h3 id="org159c7b7"><span class="section-number-3">2.4</span> 更好的解决办法</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 通过修改pip代码来使用最新版本的pip显然不是一个好办法。通过搜索python docs，发现了一个python的环境变量：PYTHONPATH
 </p>
 <div class="org-src-container">
-<pre class="src src-shell">$ export PYTHONPATH=/Users/ycchen/Library/Python/3.8/lib/python/site-packages:$PYTHONPATH
+<pre class="src src-shell">$ export PYTHONPATH=/Users/user/Library/Python/3.8/lib/python/site-packages:$PYTHONPATH
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgd341fa9" class="outline-3">
-<h3 id="orgd341fa9"><span class="section-number-3">2.5</span> 问题好像解决了？</h3>
+<div id="outline-container-orga51a1b9" class="outline-3">
+<h3 id="orga51a1b9"><span class="section-number-3">2.5</span> 问题好像解决了？</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 在后续的使用发现，以上这种解决方案的弊端是虚拟环境的概念没有了，虽然使用虚拟环境的pip，但是安装python包回安装在系统site-packages里面。
@@ -404,8 +404,8 @@ if <span class="underline"><span class="underline">name</span></span> == '<span 
 </div>
 </div>
 
-<div id="outline-container-org222760a" class="outline-3">
-<h3 id="org222760a"><span class="section-number-3">2.6</span> 回归本源</h3>
+<div id="outline-container-orgc5c8117" class="outline-3">
+<h3 id="orgc5c8117"><span class="section-number-3">2.6</span> 回归本源</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 去python官网看documents，找到了线索：
@@ -418,8 +418,8 @@ if <span class="underline"><span class="underline">name</span></span> == '<span 
 </div>
 </div>
 </div>
-<div id="outline-container-org43abf0f" class="outline-2">
-<h2 id="org43abf0f"><span class="section-number-2">3</span> 解决方案</h2>
+<div id="outline-container-org61d199a" class="outline-2">
+<h2 id="org61d199a"><span class="section-number-2">3</span> 解决方案</h2>
 <div class="outline-text-2" id="text-3">
 <ul class="org-ul">
 <li>升级python到3.9</li>
@@ -441,7 +441,7 @@ TBD：待测试
 <div id="postamble" class="status">
 <p class="date">Date: 2022-03-10 13:58</p>
 <p class="author">Author: iiCodeThings</p>
-<p class="date">Created: 2022-03-10 Thu 14:48</p>
+<p class="date">Created: 2022-03-10 Thu 14:53</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
