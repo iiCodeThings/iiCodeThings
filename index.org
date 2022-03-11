@@ -8,6 +8,8 @@
 *** [[https://www.road-trip.cc/life/sport/science-of-running.html][Science of Running]]
 *** [[https://www.road-trip.cc/life/sport/running-summary-202202.html][Running Summary-202202]]
 * Study
+** Reading Minutes
+*** [[https://www.road-trip.cc/study/reading-minutes/the-new-psychology-of-success.org][The New Psychology Of Success]]   
 ** Emacs
 *** [[https://github.com/iicodethings/emacs.git][emacs.d]]
 *** Do things with emacs
