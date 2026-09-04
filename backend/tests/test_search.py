@@ -47,6 +47,10 @@ def test_search_and_tokens_title_or_content(client, db, settings):
     assert hits[0]["hit_message_id"] is None
     assert "社会学" in hits[0]["snippet"]
 
+    assert client.delete(f"/api/sessions/{s1['id']}").status_code == 200
+    hidden = client.get("/api/search", params={"q": "社会学"}).json()["sessions"]
+    assert all(s["id"] != s1["id"] for s in hidden)
+
 
 def test_search_requires_auth(client, db, settings):
     r = client.get("/api/search", params={"q": "韦伯"})

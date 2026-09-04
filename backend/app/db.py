@@ -1,6 +1,6 @@
 from collections.abc import Generator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -31,8 +31,19 @@ def init_session_factory(engine: Engine) -> sessionmaker[Session]:
     return SessionLocal
 
 
+def migrate_schema(engine: Engine) -> None:
+    inspector = inspect(engine)
+    if "sessions" not in inspector.get_table_names():
+        return
+    cols = {c["name"] for c in inspector.get_columns("sessions")}
+    if "deleted_at" not in cols:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE sessions ADD COLUMN deleted_at DATETIME"))
+
+
 def init_db(engine: Engine) -> None:
     Base.metadata.create_all(engine)
+    migrate_schema(engine)
 
 
 def seed_default_user(db: Session, username: str, password_hash: str) -> None:

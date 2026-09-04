@@ -1,5 +1,6 @@
 from app.db import seed_default_user
 from app.security import hash_password
+from app.tables import ChatSession
 
 
 def _login(client, db, settings):
@@ -26,3 +27,15 @@ def test_sessions_crud(client, db, settings):
 
     listed = client.get("/api/sessions").json()
     assert all(s["id"] != session_id for s in listed)
+
+    db.expire_all()
+    row = db.get(ChatSession, session_id)
+    assert row is not None
+    assert row.deleted_at is not None
+
+    r = client.get(f"/api/sessions/{session_id}/messages")
+    assert r.status_code == 404
+    r = client.patch(f"/api/sessions/{session_id}", json={"title": "不应改名"})
+    assert r.status_code == 404
+    r = client.delete(f"/api/sessions/{session_id}")
+    assert r.status_code == 404

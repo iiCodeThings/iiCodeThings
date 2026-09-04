@@ -6,6 +6,7 @@ from app.config import Settings, load_settings
 
 def test_settings_accepts_required_fields():
     s = Settings(
+        _env_file=None,
         app_username="admin",
         app_password="pass",
         session_secret="secret-secret-secret-secret",
@@ -17,7 +18,8 @@ def test_settings_accepts_required_fields():
     assert s.max_upload_bytes == 20 * 1024 * 1024
 
 
-def test_load_settings_exits_when_secret_missing(monkeypatch):
+def test_load_settings_exits_when_secret_missing(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
     monkeypatch.delenv("APP_USERNAME", raising=False)
     monkeypatch.delenv("APP_PASSWORD", raising=False)
     monkeypatch.delenv("SESSION_SECRET", raising=False)

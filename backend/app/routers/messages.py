@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, selectinload, sessionmaker
 
 from app.db import get_db
 from app.deps import get_current_user
+from app.routers.sessions import get_live_session
 from app.services.attachments import UploadRejected, classify, extract_text, save_bytes
 from app.services.context import build_openai_messages, drop_oldest_turn, is_context_length_error
 from app.services.llm import stream_chat_completion
@@ -123,7 +124,7 @@ def list_messages(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    session = db.get(ChatSession, session_id)
+    session = get_live_session(db, session_id)
     if session is None:
         raise HTTPException(status_code=404, detail="会话不存在")
     limit = min(max(limit, 1), 100)
@@ -173,7 +174,7 @@ async def send_message(
     model_id_raw = form.get("model_id")
     uploads = [v for k, v in form.multi_items() if k == "files" and hasattr(v, "filename")]
     settings = request.app.state.settings
-    session = db.get(ChatSession, session_id)
+    session = get_live_session(db, session_id)
     if session is None:
         raise HTTPException(status_code=404, detail="会话不存在")
     if not model_id_raw:

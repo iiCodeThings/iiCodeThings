@@ -21,6 +21,7 @@ def search_sessions(db: Session, q: str) -> list[dict]:
     query = (
         db.query(ChatSession)
         .options(selectinload(ChatSession.messages))
+        .filter(ChatSession.deleted_at.is_(None))
         .order_by(ChatSession.updated_at.desc())
     )
     if tokens:

@@ -1,4 +1,4 @@
-from pathlib import Path
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.deps import get_current_user
-from app.tables import Attachment, ChatSession, Message, User
+from app.tables import ChatSession, User
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
@@ -20,20 +20,21 @@ def _out(row: ChatSession) -> dict:
     }
 
 
-def delete_session_files(db: Session, session_id: int) -> None:
-    paths = (
-        db.query(Attachment.storage_path)
-        .join(Message, Attachment.message_id == Message.id)
-        .filter(Message.session_id == session_id)
-        .all()
-    )
-    for (p,) in paths:
-        Path(p).unlink(missing_ok=True)
+def get_live_session(db: Session, session_id: int) -> ChatSession | None:
+    row = db.get(ChatSession, session_id)
+    if row is None or row.deleted_at is not None:
+        return None
+    return row
 
 
 @router.get("")
 def list_sessions(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    rows = db.query(ChatSession).order_by(ChatSession.updated_at.desc()).all()
+    rows = (
+        db.query(ChatSession)
+        .filter(ChatSession.deleted_at.is_(None))
+        .order_by(ChatSession.updated_at.desc())
+        .all()
+    )
     return [_out(r) for r in rows]
 
 
@@ -57,7 +58,7 @@ def patch_session(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    row = db.get(ChatSession, session_id)
+    row = get_live_session(db, session_id)
     if row is None:
         raise HTTPException(status_code=404, detail="会话不存在")
     row.title = body.title[:128]
@@ -70,10 +71,9 @@ def patch_session(
 def delete_session(
     session_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    row = db.get(ChatSession, session_id)
+    row = get_live_session(db, session_id)
     if row is None:
         raise HTTPException(status_code=404, detail="会话不存在")
-    delete_session_files(db, session_id)
-    db.delete(row)
+    row.deleted_at = datetime.utcnow()
     db.commit()
     return {"ok": True}

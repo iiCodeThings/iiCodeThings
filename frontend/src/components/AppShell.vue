@@ -1,7 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import Composer from './Composer.vue'
 import { createSession, deleteSession, listModels, listSessions, patchSession, searchSessions } from '../api.js'
 
 const route = useRoute()
@@ -172,7 +171,6 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
         </label>
         <RouterLink class="settings-link" to="/settings">设置</RouterLink>
       </div>
-      <Composer :model-id="modelId" :session-id="currentId" @send="onComposerSend" />
     </aside>
     <main class="right">
       <RouterView v-slot="{ Component }">
@@ -183,6 +181,7 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           :model-id="modelId"
           :hit-message-id="hitMessageId"
           @sent="onSent"
+          @compose="onComposerSend"
         />
       </RouterView>
     </main>
