@@ -74,6 +74,18 @@ export async function deleteSession(id) {
   return res.json()
 }
 
+export async function pinSession(id) {
+  const res = await jsonFetch(`/api/sessions/${id}/pin`, { method: 'POST' })
+  if (!res.ok) throw new Error('置顶失败')
+  return res.json()
+}
+
+export async function unpinSession(id) {
+  const res = await jsonFetch(`/api/sessions/${id}/pin`, { method: 'DELETE' })
+  if (!res.ok) throw new Error('取消置顶失败')
+  return res.json()
+}
+
 export async function retitleSession(id, modelId) {
   const res = await jsonFetch(`/api/sessions/${id}/retitle`, {
     method: 'POST',

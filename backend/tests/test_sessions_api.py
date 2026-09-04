@@ -15,6 +15,7 @@ def test_sessions_crud(client, db, settings):
     assert r.status_code == 200
     body = r.json()
     assert body["title"] == "新对话"
+    assert body["pinned"] is False
     session_id = body["id"]
 
     r = client.patch(f"/api/sessions/{session_id}", json={"title": "重命名会话"})

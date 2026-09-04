@@ -1,7 +1,15 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { createSession, deleteSession, listModels, listSessions, patchSession } from '../api.js'
+import {
+  createSession,
+  deleteSession,
+  listModels,
+  listSessions,
+  patchSession,
+  pinSession,
+  unpinSession,
+} from '../api.js'
 import Icon from './Icons.vue'
 
 function formatTime(iso) {
@@ -51,6 +59,18 @@ async function onNewChat() {
 function onSelect(s) {
   currentId.value = s.id
   if (route.path !== '/') router.push('/')
+}
+
+async function onPin(s, ev) {
+  ev.stopPropagation()
+  await pinSession(s.id)
+  await loadSessions()
+}
+
+async function onUnpin(s, ev) {
+  ev.stopPropagation()
+  await unpinSession(s.id)
+  await loadSessions()
 }
 
 async function onRename(s, ev) {
@@ -133,12 +153,25 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           <li
             v-for="s in sessions"
             :key="s.id"
-            :class="{ active: currentId === s.id }"
+            :class="{ active: currentId === s.id, pinned: s.pinned }"
             @click="onSelect(s)"
           >
             <div class="session-head">
               <span class="session-title">{{ s.title }}</span>
               <span class="session-actions">
+                <button
+                  v-if="s.pinned"
+                  type="button"
+                  class="icon-btn"
+                  title="取消置顶"
+                  aria-label="取消置顶"
+                  @click="onUnpin(s, $event)"
+                >
+                  <Icon name="unpin" />
+                </button>
+                <button type="button" class="icon-btn" title="置顶" aria-label="置顶" @click="onPin(s, $event)">
+                  <Icon name="pin" />
+                </button>
                 <button type="button" class="icon-btn" title="重命名" aria-label="重命名" @click="onRename(s, $event)">
                   <Icon name="quill" />
                 </button>

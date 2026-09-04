@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { acceptAttr } from '../api.js'
+import { shouldSendOnKeydown } from '../composerKeys.js'
 import Icon from './Icons.vue'
 
 const props = defineProps({
@@ -39,6 +40,12 @@ function onSend() {
   if (fileInput.value) fileInput.value.value = ''
 }
 
+function onKeydown(e) {
+  if (!shouldSendOnKeydown(e)) return
+  e.preventDefault()
+  onSend()
+}
+
 defineExpose({ content, files, onSend })
 </script>
 
@@ -50,6 +57,7 @@ defineExpose({ content, files, onSend })
         rows="3"
         placeholder="输入消息…"
         aria-label="消息输入"
+        @keydown="onKeydown"
       />
       <ul v-if="fileNames.length" class="file-chips">
         <li v-for="name in fileNames" :key="name">{{ name }}</li>

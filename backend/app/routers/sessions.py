@@ -19,6 +19,7 @@ def _out(row: ChatSession) -> dict:
         "title": row.title,
         "created_at": row.created_at,
         "updated_at": row.updated_at,
+        "pinned": row.pinned_at is not None,
     }
 
 
@@ -29,12 +30,29 @@ def get_live_session(db: Session, session_id: int) -> ChatSession | None:
     return row
 
 
+def _write_pin(db: Session, row: ChatSession, pinned_at: datetime | None) -> ChatSession:
+    # Keep updated_at unchanged: override Column.onupdate without rebinding a
+    # datetime (SQLite TEXT would gain ".000000" and break sort ties).
+    db.query(ChatSession).filter(ChatSession.id == row.id).update(
+        {"pinned_at": pinned_at, "updated_at": ChatSession.updated_at},
+        synchronize_session="fetch",
+    )
+    db.commit()
+    db.refresh(row)
+    return row
+
+
 @router.get("")
 def list_sessions(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     rows = (
         db.query(ChatSession)
         .filter(ChatSession.deleted_at.is_(None))
-        .order_by(ChatSession.updated_at.desc())
+        .order_by(
+            ChatSession.pinned_at.is_(None),
+            ChatSession.pinned_at.desc(),
+            ChatSession.updated_at.desc(),
+            ChatSession.id.desc(),
+        )
         .all()
     )
     return [_out(r) for r in rows]
@@ -79,6 +97,26 @@ def delete_session(
     row.deleted_at = datetime.utcnow()
     db.commit()
     return {"ok": True}
+
+
+@router.post("/{session_id}/pin")
+def pin_session(
+    session_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)
+):
+    row = get_live_session(db, session_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="会话不存在")
+    return _out(_write_pin(db, row, datetime.utcnow()))
+
+
+@router.delete("/{session_id}/pin")
+def unpin_session(
+    session_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)
+):
+    row = get_live_session(db, session_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="会话不存在")
+    return _out(_write_pin(db, row, None))
 
 
 class RetitleIn(BaseModel):

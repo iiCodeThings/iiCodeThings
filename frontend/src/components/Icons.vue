@@ -98,4 +98,70 @@ defineProps({
       stroke-linejoin="round"
     />
   </svg>
+
+  <!-- 图钉：置顶 -->
+  <svg
+    v-else-if="name === 'pin'"
+    class="icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <circle
+      cx="12"
+      cy="7.2"
+      r="3.1"
+      stroke="currentColor"
+      stroke-width="1.45"
+    />
+    <path
+      d="M12 10.4v9.2"
+      stroke="currentColor"
+      stroke-width="1.45"
+      stroke-linecap="round"
+    />
+    <path
+      d="M9.6 12.2h4.8"
+      stroke="currentColor"
+      stroke-width="1.25"
+      stroke-linecap="round"
+      opacity="0.75"
+    />
+  </svg>
+
+  <!-- 图钉斜线：取消置顶 -->
+  <svg
+    v-else-if="name === 'unpin'"
+    class="icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <circle
+      cx="12"
+      cy="7.2"
+      r="3.1"
+      stroke="currentColor"
+      stroke-width="1.45"
+    />
+    <path
+      d="M12 10.4v9.2"
+      stroke="currentColor"
+      stroke-width="1.45"
+      stroke-linecap="round"
+    />
+    <path
+      d="M9.6 12.2h4.8"
+      stroke="currentColor"
+      stroke-width="1.25"
+      stroke-linecap="round"
+      opacity="0.75"
+    />
+    <path
+      d="M6.2 5.8l11.6 12.4"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+    />
+  </svg>
 </template>

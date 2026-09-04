@@ -243,6 +243,16 @@ textarea {
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
 }
 
+.session-list li.pinned {
+  background: rgba(255, 253, 248, 0.55);
+}
+
+.session-list li.pinned .session-title::before {
+  content: "◉ ";
+  color: var(--pine);
+  font-size: 0.65rem;
+}
+
 .session-head {
   display: flex;
   align-items: flex-start;

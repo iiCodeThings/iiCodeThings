@@ -39,6 +39,9 @@ def migrate_schema(engine: Engine) -> None:
     if "deleted_at" not in cols:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE sessions ADD COLUMN deleted_at DATETIME"))
+    if "pinned_at" not in cols:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE sessions ADD COLUMN pinned_at DATETIME"))
 
 
 def init_db(engine: Engine) -> None:
