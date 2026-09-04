@@ -1,6 +1,7 @@
 <script setup>
 import { nextTick, ref, watch } from 'vue'
 import { listMessages, sendMessage } from '../api.js'
+import { renderMarkdown } from '../markdown.js'
 
 const PAGE = 50
 
@@ -20,6 +21,7 @@ const expanded = ref(new Set())
 const loadingOlder = ref(false)
 const hasMore = ref(true)
 const sending = ref(false)
+const streamingId = ref(null)
 let loadPromise = null
 let loadGen = 0
 
@@ -99,10 +101,24 @@ function onScroll() {
 }
 
 function toggleReasoning(id) {
+  if (streamingId.value != null && sameId(id, streamingId.value)) return
   const next = new Set(expanded.value)
   if (next.has(id)) next.delete(id)
   else next.add(id)
   expanded.value = next
+}
+
+function isLive(m) {
+  return streamingId.value != null && sameId(m.id, streamingId.value)
+}
+
+function reasoningOpen(m) {
+  return isLive(m) || expanded.value.has(m.id)
+}
+
+function reasoningLabel(m) {
+  if (isLive(m)) return '正在推理'
+  return reasoningOpen(m) ? '收起推理' : '推理过程'
 }
 
 async function send({ content, files, modelId }) {
@@ -131,6 +147,7 @@ async function send({ content, files, modelId }) {
   messages.value = [...messages.value, userBubble, asst]
   const liveUser = messages.value[messages.value.length - 2]
   const liveAsst = messages.value[messages.value.length - 1]
+  streamingId.value = asst.id
   await nextTick()
   scrollToBottom()
 
@@ -145,9 +162,11 @@ async function send({ content, files, modelId }) {
       files,
       onDelta: (data) => {
         liveAsst.content += data?.text || ''
+        scrollToBottom()
       },
       onReasoning: (data) => {
         liveAsst.reasoning += data?.text || ''
+        scrollToBottom()
       },
       onTruncated: () => {
         truncated.value = true
@@ -179,6 +198,7 @@ async function send({ content, files, modelId }) {
     await loadLatest({ toBottom: true })
   } finally {
     sending.value = false
+    streamingId.value = null
   }
 }
 
@@ -193,6 +213,7 @@ watch(
     warning.value = ''
     error.value = ''
     expanded.value = new Set()
+    streamingId.value = null
     if (id) {
       loadPromise = loadLatest({ toBottom: !props.hitMessageId, scrollToHit: !!props.hitMessageId })
     }
@@ -224,15 +245,23 @@ defineExpose({ send })
       class="msg"
       :class="m.role"
     >
+      <div v-if="m.role === 'assistant' && m.reasoning" class="reasoning" :class="{ live: isLive(m) }">
+        <button
+          type="button"
+          class="reasoning-toggle"
+          :disabled="isLive(m)"
+          @click="toggleReasoning(m.id)"
+        >
+          <span class="reasoning-dot" aria-hidden="true"></span>
+          {{ reasoningLabel(m) }}
+        </button>
+        <div v-show="reasoningOpen(m)" class="reasoning-body">{{ m.reasoning }}</div>
+      </div>
       <div v-if="m.model_name" class="msg-model">{{ m.model_name }}</div>
-      <div class="msg-content">{{ m.content }}</div>
+      <div v-if="m.content" class="msg-content md" v-html="renderMarkdown(m.content)"></div>
       <ul v-if="m.attachments && m.attachments.length" class="msg-attachments">
         <li v-for="(a, i) in m.attachments" :key="a.id || i">{{ a.original_filename }}</li>
       </ul>
-      <div v-if="m.role === 'assistant' && m.reasoning" class="reasoning">
-        <button type="button" @click="toggleReasoning(m.id)">查看推理</button>
-        <pre v-show="expanded.has(m.id)">{{ m.reasoning }}</pre>
-      </div>
     </div>
   </div>
 </template>

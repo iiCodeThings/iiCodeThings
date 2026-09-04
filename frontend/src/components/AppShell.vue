@@ -2,6 +2,15 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { createSession, deleteSession, listModels, listSessions, patchSession, searchSessions } from '../api.js'
+import Icon from './Icons.vue'
+
+function formatTime(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return String(iso)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -139,6 +148,10 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
   <div class="shell">
     <aside class="left">
       <div class="nav">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">对话</span>
+        </div>
         <input
           v-model="search"
           class="search"
@@ -154,22 +167,30 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
             :class="{ active: currentId === s.id }"
             @click="onSelect(s)"
           >
-            <span class="session-title">{{ s.title }}</span>
+            <div class="session-head">
+              <span class="session-title">{{ s.title }}</span>
+              <span class="session-actions">
+                <button type="button" class="icon-btn" title="重命名" aria-label="重命名" @click="onRename(s, $event)">
+                  <Icon name="quill" />
+                </button>
+                <button type="button" class="icon-btn danger" title="删除" aria-label="删除" @click="onDelete(s, $event)">
+                  <Icon name="inkx" />
+                </button>
+              </span>
+            </div>
             <span v-if="s.snippet" class="session-snippet">{{ s.snippet }}</span>
-            <span v-if="s.updated_at" class="session-time">{{ s.updated_at }}</span>
-            <span class="session-actions">
-              <button type="button" @click="onRename(s, $event)">重命名</button>
-              <button type="button" @click="onDelete(s, $event)">删除</button>
-            </span>
+            <span v-if="s.updated_at" class="session-time">{{ formatTime(s.updated_at) }}</span>
           </li>
         </ul>
-        <label class="model-select">
-          模型
-          <select v-model="selectedModelId">
-            <option v-for="m in models" :key="m.id" :value="String(m.id)">{{ m.name }}</option>
-          </select>
-        </label>
-        <RouterLink class="settings-link" to="/settings">设置</RouterLink>
+        <div class="nav-foot">
+          <label class="model-select">
+            模型
+            <select v-model="selectedModelId">
+              <option v-for="m in models" :key="m.id" :value="String(m.id)">{{ m.name }}</option>
+            </select>
+          </label>
+          <RouterLink class="settings-link" to="/settings">设置</RouterLink>
+        </div>
       </div>
     </aside>
     <main class="right">

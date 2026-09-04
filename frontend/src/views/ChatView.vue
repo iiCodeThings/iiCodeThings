@@ -27,7 +27,10 @@ defineExpose({
       :hit-message-id="hitMessageId"
       @sent="emit('sent')"
     />
-    <div v-else class="chat-placeholder">选择或新建对话</div>
+    <div v-else class="chat-placeholder">
+      <span class="placeholder-mark" aria-hidden="true"></span>
+      <p>选择左侧会话，或点「新对话」开始</p>
+    </div>
     <Composer :model-id="props.modelId" :session-id="props.currentId" @send="emit('compose', $event)" />
   </div>
 </template>

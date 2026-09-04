@@ -125,27 +125,27 @@ onMounted(async () => {
       </ul>
       <form class="model-form" @submit.prevent="onSaveModel">
         <label>
-          name
+          名称
           <input v-model="form.name" name="name" required />
         </label>
         <label>
-          base_url
+          接口地址
           <input v-model="form.base_url" name="base_url" required />
         </label>
         <label>
-          api_key
+          API Key
           <input v-model="form.api_key" name="api_key" type="password" :required="!form.id" />
         </label>
         <label>
-          model
+          模型 ID
           <input v-model="form.model" name="model" required />
         </label>
         <label class="checkbox">
           <input v-model="form.supports_vision" name="supports_vision" type="checkbox" />
-          supports_vision
+          支持图片
         </label>
         <label>
-          sort_order
+          排序
           <input v-model.number="form.sort_order" name="sort_order" type="number" />
         </label>
         <button type="submit">{{ form.id ? '更新模型' : '添加模型' }}</button>
@@ -157,7 +157,7 @@ onMounted(async () => {
       <h2>修改密码</h2>
       <form class="password-form" @submit.prevent="onChangePassword">
         <label>
-          old_password
+          当前密码
           <input
             v-model="passwordForm.old_password"
             name="old_password"
@@ -166,7 +166,7 @@ onMounted(async () => {
           />
         </label>
         <label>
-          new_password
+          新密码
           <input
             v-model="passwordForm.new_password"
             name="new_password"

@@ -24,9 +24,14 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="login">
-    <h1>登录</h1>
-    <form @submit.prevent="onSubmit">
+  <div class="login-page">
+    <div class="login">
+      <div class="brand login-brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">对话</span>
+      </div>
+      <h1>登录</h1>
+      <form @submit.prevent="onSubmit">
       <label>
         用户名
         <input v-model="username" name="username" autocomplete="username" required />
@@ -44,5 +49,6 @@ async function onSubmit() {
       <p v-if="error" class="error">{{ error }}</p>
       <button type="submit" :disabled="loading">登录</button>
     </form>
+    </div>
   </div>
 </template>
