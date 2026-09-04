@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import Composer from './Composer.vue'
 import { createSession, listModels, listSessions } from '../api.js'
@@ -33,6 +33,14 @@ async function loadSessions() {
 
 async function loadModels() {
   models.value = await listModels()
+  const ids = models.value.map((m) => String(m.id))
+  if (models.value.length === 0) {
+    selectedModelId.value = ''
+    return
+  }
+  if (!selectedModelId.value || !ids.includes(selectedModelId.value)) {
+    selectedModelId.value = String(models.value[0].id)
+  }
 }
 
 async function onNewChat() {
@@ -54,6 +62,19 @@ onMounted(async () => {
     /* 401 redirects via jsonFetch */
   }
 })
+
+watch(
+  () => route.path,
+  async (path, prev) => {
+    if (prev === '/settings' && path !== '/settings') {
+      try {
+        await loadModels()
+      } catch {
+        /* 401 redirects via jsonFetch */
+      }
+    }
+  },
+)
 
 defineExpose({ loadSessions, loadModels, currentId, modelId })
 </script>
