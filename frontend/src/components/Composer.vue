@@ -25,7 +25,8 @@ function onSend() {
   const text = content.value
   const fileList = files.value
   if (!text.trim() && (!fileList || fileList.length === 0)) return
-  emit('send', { content: text, files: fileList })
+  const snapshot = fileList ? [...fileList] : []
+  emit('send', { content: text, files: snapshot })
   content.value = ''
   files.value = null
   if (fileInput.value) fileInput.value.value = ''

@@ -80,6 +80,10 @@ async function onComposerSend({ content, files }) {
   await viewRef.value?.send({ content, files, modelId: modelId.value })
 }
 
+function onSent() {
+  runSearch(search.value).catch(() => {})
+}
+
 watch(search, (q) => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
@@ -153,7 +157,7 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           :current-id="currentId"
           :model-id="modelId"
           :hit-message-id="hitMessageId"
-          @sent="loadSessions"
+          @sent="onSent"
         />
       </RouterView>
     </main>

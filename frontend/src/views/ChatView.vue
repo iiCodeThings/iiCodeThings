@@ -19,6 +19,7 @@ defineExpose({
 <template>
   <MessagePane
     v-if="currentId"
+    :key="currentId"
     ref="pane"
     :session-id="currentId"
     :hit-message-id="hitMessageId"

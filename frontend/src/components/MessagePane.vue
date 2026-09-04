@@ -20,6 +20,7 @@ const loadingOlder = ref(false)
 const hasMore = ref(true)
 const sending = ref(false)
 let loadPromise = null
+let loadGen = 0
 
 function numericIds() {
   return messages.value.map((m) => m.id).filter((id) => Number.isInteger(id))
@@ -36,27 +37,39 @@ function sameId(a, b) {
 
 async function ensureHitVisible(hitId) {
   if (!hitId) return
+  const gen = loadGen
   while (!messages.value.some((m) => sameId(m.id, hitId)) && hasMore.value) {
+    if (gen !== loadGen) return
     await loadOlder()
   }
+  if (gen !== loadGen) return
   await nextTick()
   document.getElementById('msg-' + hitId)?.scrollIntoView()
 }
 
 async function loadLatest({ toBottom = true, scrollToHit = false } = {}) {
-  const data = await listMessages(props.sessionId, { limit: PAGE })
-  messages.value = data.messages || []
-  hasMore.value = (data.messages || []).length >= PAGE
-  await nextTick()
-  if (scrollToHit && props.hitMessageId) {
-    await ensureHitVisible(props.hitMessageId)
-  } else if (toBottom) {
-    scrollToBottom()
+  const gen = loadGen
+  try {
+    const data = await listMessages(props.sessionId, { limit: PAGE })
+    if (gen !== loadGen) return
+    messages.value = data.messages || []
+    hasMore.value = (data.messages || []).length >= PAGE
+    await nextTick()
+    if (gen !== loadGen) return
+    if (scrollToHit && props.hitMessageId) {
+      await ensureHitVisible(props.hitMessageId)
+    } else if (toBottom) {
+      scrollToBottom()
+    }
+  } catch (e) {
+    if (gen !== loadGen) return
+    error.value = error.value || e.message || '加载消息失败'
   }
 }
 
 async function loadOlder() {
   if (loadingOlder.value || !hasMore.value) return
+  const gen = loadGen
   const ids = numericIds()
   if (!ids.length) return
   loadingOlder.value = true
@@ -65,6 +78,7 @@ async function loadOlder() {
   try {
     const minId = Math.min(...ids)
     const data = await listMessages(props.sessionId, { beforeId: minId, limit: PAGE })
+    if (gen !== loadGen) return
     const older = data.messages || []
     if (older.length < PAGE) hasMore.value = false
     if (older.length) {
@@ -75,7 +89,7 @@ async function loadOlder() {
       hasMore.value = false
     }
   } finally {
-    loadingOlder.value = false
+    if (gen === loadGen) loadingOlder.value = false
   }
 }
 
@@ -97,15 +111,16 @@ async function send({ content, files, modelId }) {
   error.value = ''
   truncated.value = false
 
+  const stamp = Date.now()
   const userBubble = {
-    id: 'pending-user',
+    id: 'pending-user-' + stamp,
     role: 'user',
     content,
     reasoning: null,
     attachments: files ? [...files].map((f) => ({ original_filename: f.name })) : [],
   }
   const asst = {
-    id: 'pending-asst',
+    id: 'pending-asst-' + stamp,
     role: 'assistant',
     content: '',
     reasoning: '',
@@ -148,15 +163,15 @@ async function send({ content, files, modelId }) {
     if (httpError) {
       messages.value = messages.value.filter((m) => m !== liveUser && m !== liveAsst)
     } else if (streamError || !gotDone) {
-      messages.value = messages.value.filter((m) => m !== liveAsst)
       if (!gotDone && !streamError) error.value = error.value || '生成失败'
+      await loadLatest({ toBottom: true })
     } else {
       await loadLatest({ toBottom: true })
       emit('sent')
     }
   } catch (e) {
     error.value = e.message || '发送失败'
-    messages.value = messages.value.filter((m) => m !== liveAsst)
+    await loadLatest({ toBottom: true })
   } finally {
     sending.value = false
   }
@@ -165,6 +180,10 @@ async function send({ content, files, modelId }) {
 watch(
   () => props.sessionId,
   (id) => {
+    loadGen += 1
+    messages.value = []
+    hasMore.value = true
+    loadingOlder.value = false
     truncated.value = false
     error.value = ''
     expanded.value = new Set()
@@ -177,8 +196,10 @@ watch(
 
 watch(
   () => props.hitMessageId,
-  (id) => {
-    if (id) ensureHitVisible(id)
+  async (id) => {
+    if (!id) return
+    if (loadPromise) await loadPromise
+    await ensureHitVisible(id)
   },
 )
 
