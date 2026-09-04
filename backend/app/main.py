@@ -19,8 +19,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.engine = engine
 
     from app.routers import auth as auth_router
+    from app.routers import llm_models as llm_models_router
 
     app.include_router(auth_router.router)
+    app.include_router(llm_models_router.router)
 
     from app.db import SessionLocal
 
