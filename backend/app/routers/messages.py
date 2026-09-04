@@ -113,6 +113,52 @@ async def _generate(
         db.close()
 
 
+@router.get("/{session_id}/messages")
+def list_messages(
+    session_id: int,
+    before_id: int | None = None,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    session = db.get(ChatSession, session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="会话不存在")
+    limit = min(max(limit, 1), 100)
+    q = (
+        db.query(Message)
+        .options(selectinload(Message.attachments))
+        .filter(Message.session_id == session_id)
+    )
+    if before_id is not None:
+        q = q.filter(Message.id < before_id)
+    rows = q.order_by(Message.id.desc()).limit(limit).all()
+    rows.reverse()
+    return {
+        "messages": [
+            {
+                "id": m.id,
+                "role": m.role,
+                "content": m.content,
+                "reasoning": m.reasoning,
+                "model_name": m.model_name,
+                "model": m.model,
+                "created_at": m.created_at,
+                "attachments": [
+                    {
+                        "id": a.id,
+                        "kind": a.kind,
+                        "original_filename": a.original_filename,
+                        "mime_type": a.mime_type,
+                    }
+                    for a in m.attachments
+                ],
+            }
+            for m in rows
+        ]
+    }
+
+
 @router.post("/{session_id}/messages")
 async def send_message(
     session_id: int,
