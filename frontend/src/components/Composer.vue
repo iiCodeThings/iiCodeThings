@@ -7,6 +7,8 @@ const props = defineProps({
   sessionId: { type: [Number, String, null], default: null },
 })
 
+const emit = defineEmits(['send'])
+
 const content = ref('')
 const files = ref(null)
 const fileInput = ref(null)
@@ -20,7 +22,13 @@ function onSend() {
     alert('请先在设置中添加模型')
     return
   }
-  // Task 15: sendMessage streaming
+  const text = content.value
+  const fileList = files.value
+  if (!text.trim() && (!fileList || fileList.length === 0)) return
+  emit('send', { content: text, files: fileList })
+  content.value = ''
+  files.value = null
+  if (fileInput.value) fileInput.value.value = ''
 }
 
 defineExpose({ content, files, onSend })
