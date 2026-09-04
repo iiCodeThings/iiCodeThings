@@ -74,6 +74,18 @@ export async function deleteSession(id) {
   return res.json()
 }
 
+export async function retitleSession(id, modelId) {
+  const res = await jsonFetch(`/api/sessions/${id}/retitle`, {
+    method: 'POST',
+    body: JSON.stringify({ model_id: modelId }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(typeof data.detail === 'string' ? data.detail : '重建标题失败')
+  }
+  return data
+}
+
 export async function listModels() {
   const res = await jsonFetch('/api/models')
   if (!res.ok) throw new Error('加载模型失败')

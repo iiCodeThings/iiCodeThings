@@ -170,6 +170,7 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           :model-id="modelId"
           @sent="onSent"
           @compose="onComposerSend"
+          @retitled="onSent"
         />
       </RouterView>
     </main>

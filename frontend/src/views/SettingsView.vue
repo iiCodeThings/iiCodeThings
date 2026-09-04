@@ -1,18 +1,27 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   changePassword,
   createModel,
   deleteModel,
   listModels,
+  listSessions,
+  retitleSession,
   updateModel,
 } from '../api.js'
+
+const emit = defineEmits(['retitled'])
 
 const router = useRouter()
 const models = ref([])
 const error = ref('')
 const passwordMsg = ref('')
+
+const retitleModelId = ref('')
+const retitleRunning = ref(false)
+const retitleProgress = ref('')
+const retitleCancelled = ref(false)
 
 const form = reactive({
   id: null,
@@ -31,6 +40,13 @@ const passwordForm = reactive({
 
 async function loadModels() {
   models.value = await listModels()
+  if (
+    models.value.length &&
+    (!retitleModelId.value ||
+      !models.value.some((m) => String(m.id) === retitleModelId.value))
+  ) {
+    retitleModelId.value = String(models.value[0].id)
+  }
 }
 
 function resetForm() {
@@ -87,6 +103,50 @@ async function onDeleteModel(id) {
   }
 }
 
+async function onRebuildTitles() {
+  if (!models.value.length) return
+  if (
+    !confirm(
+      '将用所选模型为所有未删除会话重新生成标题。已有标题（含手动修改）会被覆盖；没有消息的会话会跳过。',
+    )
+  ) {
+    return
+  }
+  retitleCancelled.value = false
+  retitleRunning.value = true
+  let ok = 0
+  let skipped = 0
+  let failed = 0
+  let done = 0
+  try {
+    const sessions = await listSessions()
+    const total = sessions.length
+    for (const session of sessions) {
+      if (retitleCancelled.value) break
+      retitleProgress.value = `已完成 ${done}/${total}，失败 ${failed}`
+      try {
+        const result = await retitleSession(session.id, Number(retitleModelId.value))
+        if (result.skipped === true) {
+          skipped++
+        } else {
+          ok++
+          emit('retitled')
+        }
+      } catch {
+        failed++
+      }
+      done = ok + skipped + failed
+    }
+    if (!retitleCancelled.value) {
+      retitleProgress.value = `完成：成功 ${ok}，跳过 ${skipped}（无消息），失败 ${failed}`
+    }
+  } catch (e) {
+    error.value = e.message || '重建标题失败'
+  } finally {
+    retitleRunning.value = false
+  }
+}
+
 async function onChangePassword() {
   passwordMsg.value = ''
   error.value = ''
@@ -107,6 +167,10 @@ onMounted(async () => {
   } catch {
     /* 401 redirects */
   }
+})
+
+onUnmounted(() => {
+  retitleCancelled.value = true
 })
 </script>
 
@@ -151,6 +215,20 @@ onMounted(async () => {
         <button type="submit">{{ form.id ? '更新模型' : '添加模型' }}</button>
         <button v-if="form.id" type="button" @click="resetForm">取消</button>
       </form>
+    </section>
+
+    <section>
+      <h2>重建会话标题</h2>
+      <form class="password-form retitle-form" @submit.prevent="onRebuildTitles">
+        <label>
+          模型
+          <select v-model="retitleModelId" :disabled="retitleRunning || !models.length">
+            <option v-for="m in models" :key="m.id" :value="String(m.id)">{{ m.name }}</option>
+          </select>
+        </label>
+        <button type="submit" :disabled="retitleRunning || !models.length">重建全部标题</button>
+      </form>
+      <p v-if="retitleProgress">{{ retitleProgress }}</p>
     </section>
 
     <section>

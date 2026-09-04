@@ -123,7 +123,8 @@ textarea {
 .login input,
 .model-select select,
 .model-form input,
-.password-form input {
+.password-form input,
+.retitle-form select {
   padding: 0.58rem 0.72rem;
   border: 1px solid var(--paper-line);
   border-radius: 10px;
@@ -136,7 +137,8 @@ textarea {
 .model-select select:focus,
 .composer-box textarea:focus,
 .model-form input:focus,
-.password-form input:focus {
+.password-form input:focus,
+.retitle-form select:focus {
   outline: none;
   border-color: #8fb5a3;
   box-shadow: 0 0 0 3px rgba(36, 85, 68, 0.12);
@@ -147,6 +149,7 @@ textarea {
 .send-btn,
 .model-form button,
 .password-form button,
+.retitle-form button,
 .model-list button {
   padding: 0.58rem 0.9rem;
   border: 0;
@@ -163,6 +166,7 @@ textarea {
 .send-btn:hover,
 .model-form button:hover,
 .password-form button:hover,
+.retitle-form button:hover,
 .model-list button:hover {
   background: var(--pine-hover);
 }
@@ -759,14 +763,16 @@ textarea {
 }
 
 .model-form,
-.password-form {
+.password-form,
+.retitle-form {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
 }
 
 .model-form label,
-.password-form label {
+.password-form label,
+.retitle-form label {
   display: flex;
   flex-direction: column;
   gap: 0.28rem;
@@ -782,6 +788,7 @@ textarea {
 
 .model-form button,
 .password-form button,
+.retitle-form button,
 .model-list button {
   align-self: flex-start;
 }
