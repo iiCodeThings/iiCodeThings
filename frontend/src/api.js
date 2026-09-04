@@ -195,4 +195,4 @@ export async function sendMessage({
   }
 }
 
-export const acceptAttr = '.jpg,.jpeg,.png,.webp,.txt,.md,.doc,.docx'
+export const acceptAttr = '.jpg,.jpeg,.png,.webp,.txt,.md,.doc,.docx,.pdf,.xls,.xlsx,.csv,.tsv,.json,.jsonl'
