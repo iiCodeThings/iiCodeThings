@@ -18,6 +18,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.engine = engine
 
+    from app.routers import auth as auth_router
+
+    app.include_router(auth_router.router)
+
     from app.db import SessionLocal
 
     db = SessionLocal()
