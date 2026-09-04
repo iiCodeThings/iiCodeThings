@@ -181,6 +181,22 @@ body {
   color: #666;
 }
 
+.session-actions {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
+}
+
+.session-actions button {
+  padding: 0.15rem 0.4rem;
+  border: 1px solid #c8c8c4;
+  border-radius: 3px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
 .model-select {
   display: flex;
   flex-direction: column;
@@ -223,7 +239,8 @@ body {
   min-height: 0;
 }
 
-.truncation-banner {
+.truncation-banner,
+.extract-warning {
   position: sticky;
   top: 0;
   z-index: 1;
@@ -262,6 +279,12 @@ body {
 .msg.assistant {
   margin-right: auto;
   background: #ecebe6;
+}
+
+.msg-model {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
 }
 
 .msg-attachments {

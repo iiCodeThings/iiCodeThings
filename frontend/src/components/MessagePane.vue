@@ -14,6 +14,7 @@ const emit = defineEmits(['sent'])
 const paneEl = ref(null)
 const messages = ref([])
 const truncated = ref(false)
+const warning = ref('')
 const error = ref('')
 const expanded = ref(new Set())
 const loadingOlder = ref(false)
@@ -110,6 +111,7 @@ async function send({ content, files, modelId }) {
   sending.value = true
   error.value = ''
   truncated.value = false
+  warning.value = ''
 
   const stamp = Date.now()
   const userBubble = {
@@ -150,6 +152,9 @@ async function send({ content, files, modelId }) {
       onTruncated: () => {
         truncated.value = true
       },
+      onWarning: (data) => {
+        warning.value = data?.text || '文档未能抽出文字，已保存原文件'
+      },
       onDone: () => {
         gotDone = true
       },
@@ -185,6 +190,7 @@ watch(
     hasMore.value = true
     loadingOlder.value = false
     truncated.value = false
+    warning.value = ''
     error.value = ''
     expanded.value = new Set()
     if (id) {
@@ -209,6 +215,7 @@ defineExpose({ send })
 <template>
   <div ref="paneEl" class="message-pane" @scroll="onScroll">
     <div v-if="truncated" class="truncation-banner">上下文过长，已截断较早消息</div>
+    <div v-if="warning" class="extract-warning">{{ warning }}</div>
     <div v-if="error" class="chat-error">{{ error }}</div>
     <div
       v-for="m in messages"
@@ -217,6 +224,7 @@ defineExpose({ send })
       class="msg"
       :class="m.role"
     >
+      <div v-if="m.model_name" class="msg-model">{{ m.model_name }}</div>
       <div class="msg-content">{{ m.content }}</div>
       <ul v-if="m.attachments && m.attachments.length" class="msg-attachments">
         <li v-for="(a, i) in m.attachments" :key="a.id || i">{{ a.original_filename }}</li>

@@ -40,3 +40,26 @@ async def test_stream_chat_completion_reasoning_delta_done():
         ("delta", "hi"),
         ("done", ""),
     ]
+
+
+@pytest.mark.asyncio
+async def test_stream_chat_completion_timeout_yields_error():
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ReadTimeout("timed out")
+
+    transport = httpx.MockTransport(handler)
+    async with httpx.AsyncClient(transport=transport) as client:
+        events = [
+            event
+            async for event in stream_chat_completion(
+                base_url="https://api.example.com/v1",
+                api_key="test-key",
+                model="gpt-test",
+                messages=[{"role": "user", "content": "hello"}],
+                client=client,
+            )
+        ]
+
+    assert len(events) == 1
+    assert events[0].kind == "error"
+    assert events[0].text

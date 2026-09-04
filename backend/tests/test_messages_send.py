@@ -1,7 +1,7 @@
 from app.db import seed_default_user
 from app.security import hash_password
 from app.services.llm import StreamEvent
-from app.tables import LlmModel, Message
+from app.tables import Attachment, LlmModel, Message
 
 
 def _login(client, db, settings):
@@ -87,3 +87,44 @@ def test_send_message_persists_user_and_assistant(client, db, settings, monkeypa
     assert assistant_msg.content == "hello"
     assert assistant_msg.model_name == "展示名"
     assert assistant_msg.model == "api-model-id"
+
+
+def test_send_bad_docx_emits_warning_and_saves(client, db, settings, monkeypatch):
+    async def fake_stream(**kwargs):
+        yield StreamEvent(kind="delta", text="ok")
+        yield StreamEvent(kind="done")
+
+    monkeypatch.setattr("app.routers.messages.stream_chat_completion", fake_stream)
+
+    _login(client, db, settings)
+    session_id = client.post("/api/sessions").json()["id"]
+    model = LlmModel(
+        name="Display",
+        base_url="https://example.com/v1",
+        api_key="sk-test",
+        model="api-id",
+        supports_vision=False,
+    )
+    db.add(model)
+    db.commit()
+    db.refresh(model)
+
+    r = client.post(
+        f"/api/sessions/{session_id}/messages",
+        data={"content": "see file", "model_id": str(model.id)},
+        files={
+            "files": (
+                "bad.docx",
+                b"not a zip",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            )
+        },
+    )
+    assert r.status_code == 200
+    assert "event: warning" in r.text
+    assert "文档未能抽出文字，已保存原文件" in r.text
+
+    db.expire_all()
+    att = db.query(Attachment).one()
+    assert att.extracted_text is None
+    assert att.original_filename == "bad.docx"

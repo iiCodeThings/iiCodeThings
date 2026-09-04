@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import json
 from collections.abc import AsyncIterator
-from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
+from sqlalchemy import func
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, selectinload, sessionmaker
 
@@ -62,6 +62,8 @@ async def _generate(
             .all()
         )
         items = [_to_item(m) for m in rows]
+        if any(a.kind == "document" and a.extracted_text is None for a in user_msg.attachments):
+            yield _sse("warning", {"text": "文档未能抽出文字，已保存原文件"})
         while True:
             openai_msgs = build_openai_messages(items)
             failed, failed_status = None, 0
@@ -99,7 +101,7 @@ async def _generate(
                 model=model_row.model,
             )
             db.add(assistant)
-            session.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            session.updated_at = func.now()
             if session.title == "新对话":
                 first_name = (
                     user_msg.attachments[0].original_filename if user_msg.attachments else None

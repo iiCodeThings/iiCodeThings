@@ -57,6 +57,10 @@ async def stream_chat_completion(
                 if content:
                     yield StreamEvent(kind="delta", text=content)
             yield StreamEvent(kind="done")
+    except httpx.TimeoutException:
+        yield StreamEvent(kind="error", text="上游请求超时")
+    except httpx.RequestError as exc:
+        yield StreamEvent(kind="error", text=f"上游连接失败：{exc}")
     finally:
         if own:
             await client.aclose()

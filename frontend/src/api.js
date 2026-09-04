@@ -139,6 +139,7 @@ export async function sendMessage({
   onDelta,
   onReasoning,
   onTruncated,
+  onWarning,
   onDone,
   onError,
 }) {
@@ -173,6 +174,7 @@ export async function sendMessage({
       if (ev.event === 'delta') onDelta?.(ev.data)
       else if (ev.event === 'reasoning') onReasoning?.(ev.data)
       else if (ev.event === 'truncated') onTruncated?.(ev.data)
+      else if (ev.event === 'warning') onWarning?.(ev.data)
       else if (ev.event === 'done') onDone?.(ev.data)
       else if (ev.event === 'error') onError?.(ev.data?.text || '生成失败', { http: false })
     }

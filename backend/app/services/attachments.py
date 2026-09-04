@@ -40,18 +40,21 @@ def save_bytes(
 
 def extract_text(path: str, suffix: str) -> str | None:
     suffix = suffix.lower()
-    if suffix in {".txt", ".md"}:
-        return Path(path).read_text(encoding="utf-8", errors="replace")
-    if suffix == ".docx":
-        return "\n".join(p.text for p in Document(path).paragraphs)
-    if suffix == ".doc":
-        try:
-            proc = subprocess.run(
-                ["antiword", path], capture_output=True, timeout=30, check=False
-            )
-        except FileNotFoundError:
-            return None
-        if proc.returncode != 0:
-            return None
-        return proc.stdout.decode("utf-8", errors="replace")
-    return None
+    try:
+        if suffix in {".txt", ".md"}:
+            return Path(path).read_text(encoding="utf-8", errors="replace")
+        if suffix == ".docx":
+            return "\n".join(p.text for p in Document(path).paragraphs)
+        if suffix == ".doc":
+            try:
+                proc = subprocess.run(
+                    ["antiword", path], capture_output=True, timeout=30, check=False
+                )
+            except FileNotFoundError:
+                return None
+            if proc.returncode != 0:
+                return None
+            return proc.stdout.decode("utf-8", errors="replace")
+        return None
+    except Exception:
+        return None

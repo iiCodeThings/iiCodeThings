@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import Composer from './Composer.vue'
-import { createSession, listModels, listSessions, searchSessions } from '../api.js'
+import { createSession, deleteSession, listModels, listSessions, patchSession, searchSessions } from '../api.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -58,6 +58,27 @@ function onSelect(s) {
   currentId.value = s.id
   hitMessageId.value = s.hit_message_id ?? null
   if (route.path !== '/') router.push('/')
+}
+
+async function onRename(s, ev) {
+  ev.stopPropagation()
+  const next = window.prompt('重命名会话', s.title)
+  if (next == null) return
+  const title = next.trim()
+  if (!title) return
+  await patchSession(s.id, title)
+  await runSearch(search.value)
+}
+
+async function onDelete(s, ev) {
+  ev.stopPropagation()
+  if (!window.confirm(`删除会话「${s.title}」？`)) return
+  await deleteSession(s.id)
+  if (currentId.value === s.id) {
+    currentId.value = null
+    hitMessageId.value = null
+  }
+  await runSearch(search.value)
 }
 
 async function onComposerSend({ content, files }) {
@@ -137,6 +158,10 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
             <span class="session-title">{{ s.title }}</span>
             <span v-if="s.snippet" class="session-snippet">{{ s.snippet }}</span>
             <span v-if="s.updated_at" class="session-time">{{ s.updated_at }}</span>
+            <span class="session-actions">
+              <button type="button" @click="onRename(s, $event)">重命名</button>
+              <button type="button" @click="onDelete(s, $event)">删除</button>
+            </span>
           </li>
         </ul>
         <label class="model-select">
