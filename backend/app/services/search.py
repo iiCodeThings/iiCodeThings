@@ -1,5 +1,5 @@
 from sqlalchemy import or_
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.tables import ChatSession, Message
 
@@ -73,3 +73,32 @@ def search_sessions(db: Session, q: str) -> list[dict]:
             }
         )
     return out
+
+
+def search_messages(db: Session, q: str) -> list[dict]:
+    tokens = tokenize_query(q)
+    if not tokens:
+        return []
+    query = (
+        db.query(Message)
+        .join(ChatSession, Message.session_id == ChatSession.id)
+        .options(joinedload(Message.session))
+        .filter(ChatSession.deleted_at.is_(None))
+        .order_by(Message.id.desc())
+    )
+    for tok in tokens:
+        pattern = f"%{like_escape(tok)}%"
+        query = query.filter(Message.content.like(pattern, escape="\\"))
+    rows = query.limit(100).all()
+    return [
+        {
+            "id": m.id,
+            "session_id": m.session_id,
+            "session_title": m.session.title if m.session else "",
+            "role": m.role,
+            "content": m.content or "",
+            "created_at": m.created_at,
+            "model_name": m.model_name,
+        }
+        for m in rows
+    ]

@@ -81,4 +81,21 @@ defineProps({
       stroke-linejoin="round"
     />
   </svg>
+
+  <!-- 展开 / 收起 -->
+  <svg
+    v-else-if="name === 'more'"
+    class="icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M5 9.2c2.4 1.4 4.6 4.6 7 7.6 2.4-3 4.7-6.2 7.1-7.6"
+      stroke="currentColor"
+      stroke-width="1.55"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
 </template>

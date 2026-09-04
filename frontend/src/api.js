@@ -120,8 +120,8 @@ export async function listMessages(sessionId, { beforeId, limit } = {}) {
   return res.json()
 }
 
-export async function searchSessions(q) {
-  const res = await jsonFetch(`/api/search?q=${encodeURIComponent(q ?? '')}`)
+export async function searchMessages(q) {
+  const res = await jsonFetch(`/api/search/messages?q=${encodeURIComponent(q ?? '')}`)
   if (!res.ok) throw new Error('搜索失败')
   return res.json()
 }

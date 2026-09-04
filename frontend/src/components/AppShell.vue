@@ -1,7 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { createSession, deleteSession, listModels, listSessions, patchSession, searchSessions } from '../api.js'
+import { createSession, deleteSession, listModels, listSessions, patchSession } from '../api.js'
 import Icon from './Icons.vue'
 
 function formatTime(iso) {
@@ -16,13 +16,10 @@ const route = useRoute()
 const router = useRouter()
 
 const currentId = ref(null)
-const hitMessageId = ref(null)
 const sessions = ref([])
 const models = ref([])
-const search = ref('')
 const selectedModelId = ref('')
 const viewRef = ref(null)
-let searchTimer = null
 
 const modelId = computed(() =>
   selectedModelId.value === '' ? null : Number(selectedModelId.value),
@@ -44,27 +41,15 @@ async function loadModels() {
   }
 }
 
-async function runSearch(q) {
-  const trimmed = q.trim()
-  if (!trimmed) {
-    await loadSessions()
-    return
-  }
-  const data = await searchSessions(trimmed)
-  sessions.value = data.sessions || []
-}
-
 async function onNewChat() {
   const s = await createSession()
   await loadSessions()
   currentId.value = s.id
-  hitMessageId.value = null
   if (route.path !== '/') router.push('/')
 }
 
 function onSelect(s) {
   currentId.value = s.id
-  hitMessageId.value = s.hit_message_id ?? null
   if (route.path !== '/') router.push('/')
 }
 
@@ -75,7 +60,7 @@ async function onRename(s, ev) {
   const title = next.trim()
   if (!title) return
   await patchSession(s.id, title)
-  await runSearch(search.value)
+  await loadSessions()
 }
 
 async function onDelete(s, ev) {
@@ -84,9 +69,8 @@ async function onDelete(s, ev) {
   await deleteSession(s.id)
   if (currentId.value === s.id) {
     currentId.value = null
-    hitMessageId.value = null
   }
-  await runSearch(search.value)
+  await loadSessions()
 }
 
 async function onComposerSend({ content, files }) {
@@ -102,7 +86,6 @@ async function onComposerSend({ content, files }) {
     const s = await createSession()
     await loadSessions()
     currentId.value = s.id
-    hitMessageId.value = null
     await nextTick()
   }
   await nextTick()
@@ -110,15 +93,8 @@ async function onComposerSend({ content, files }) {
 }
 
 function onSent() {
-  runSearch(search.value).catch(() => {})
+  loadSessions().catch(() => {})
 }
-
-watch(search, (q) => {
-  clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => {
-    runSearch(q).catch(() => {})
-  }, 300)
-})
 
 onMounted(async () => {
   try {
@@ -152,13 +128,6 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           <span class="brand-mark" aria-hidden="true"></span>
           <span class="brand-name">对话</span>
         </div>
-        <input
-          v-model="search"
-          class="search"
-          type="search"
-          placeholder="搜索对话"
-          aria-label="搜索对话"
-        />
         <button type="button" class="new-chat" @click="onNewChat">新对话</button>
         <ul class="session-list">
           <li
@@ -178,7 +147,6 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
                 </button>
               </span>
             </div>
-            <span v-if="s.snippet" class="session-snippet">{{ s.snippet }}</span>
             <span v-if="s.updated_at" class="session-time">{{ formatTime(s.updated_at) }}</span>
           </li>
         </ul>
@@ -200,7 +168,6 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           ref="viewRef"
           :current-id="currentId"
           :model-id="modelId"
-          :hit-message-id="hitMessageId"
           @sent="onSent"
           @compose="onComposerSend"
         />

@@ -4,6 +4,7 @@ import App from './App.vue'
 import AppShell from './components/AppShell.vue'
 import LoginView from './views/LoginView.vue'
 import ChatView from './views/ChatView.vue'
+import SearchView from './views/SearchView.vue'
 import SettingsView from './views/SettingsView.vue'
 import './styles.css'
 
@@ -11,6 +12,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', component: LoginView },
+    { path: '/search', component: SearchView },
     {
       path: '/',
       component: AppShell,

@@ -52,6 +52,30 @@ def test_search_and_tokens_title_or_content(client, db, settings):
     assert all(s["id"] != s1["id"] for s in hidden)
 
 
+def test_search_messages_and_tokens_on_content(client, db, settings):
+    _login(client, db, settings)
+    s1 = _make_session(client, db, "社会学笔记", "韦伯")
+    s2 = _make_session(client, db, "闲聊", "韦伯 人类学")
+
+    r = client.get("/api/search/messages", params={"q": "韦伯 人类学"})
+    assert r.status_code == 200
+    body = r.json()
+    ids = [m["id"] for m in body["messages"]]
+    assert ids == [s2["message_id"]]
+    assert body["messages"][0]["session_id"] == s2["id"]
+    assert "韦伯" in body["messages"][0]["content"]
+
+    title_only = client.get("/api/search/messages", params={"q": "社会学"}).json()["messages"]
+    assert title_only == []
+
+    empty = client.get("/api/search/messages", params={"q": ""}).json()["messages"]
+    assert empty == []
+
+    assert client.delete(f"/api/sessions/{s2['id']}").status_code == 200
+    hidden = client.get("/api/search/messages", params={"q": "韦伯 人类学"}).json()["messages"]
+    assert all(m["id"] != s2["message_id"] for m in hidden)
+
+
 def test_search_requires_auth(client, db, settings):
     r = client.get("/api/search", params={"q": "韦伯"})
     assert r.status_code in (401, 403)
