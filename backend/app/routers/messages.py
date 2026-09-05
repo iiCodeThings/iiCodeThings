@@ -15,7 +15,7 @@ from app.deps import get_current_user
 from app.routers.sessions import get_live_session
 from app.services.attachments import UploadRejected, classify, extract_text, save_bytes
 from app.services.context import build_openai_messages, drop_oldest_turn, is_context_length_error
-from app.services.llm import stream_chat_completion
+from app.services.llm import parse_enable_thinking, stream_chat_completion
 from app.tables import Attachment, ChatSession, LlmModel, Message, User
 from app.title import auto_title
 
@@ -42,7 +42,7 @@ def _to_item(msg: Message) -> dict:
 
 
 async def _generate(
-    bind: Engine, session_id: int, model_id: int, user_msg_id: int
+    bind: Engine, session_id: int, model_id: int, user_msg_id: int, enable_thinking: bool
 ) -> AsyncIterator[str]:
     StreamSession = sessionmaker(bind=bind, autoflush=False, autocommit=False)
     db = StreamSession()
@@ -74,6 +74,7 @@ async def _generate(
                 api_key=model_row.api_key,
                 model=model_row.model,
                 messages=openai_msgs,
+                enable_thinking=enable_thinking,
             ):
                 if ev.kind == "error":
                     failed, failed_status = ev.text, ev.status_code or 500
@@ -82,6 +83,8 @@ async def _generate(
                     content_acc += ev.text
                     yield _sse("delta", {"text": ev.text})
                 elif ev.kind == "reasoning":
+                    if not enable_thinking:
+                        continue
                     reasoning_acc += ev.text
                     yield _sse("reasoning", {"text": ev.text})
                 elif ev.kind == "done":
@@ -172,6 +175,7 @@ async def send_message(
     form = await request.form()
     content = str(form.get("content") or "")
     model_id_raw = form.get("model_id")
+    enable_thinking = parse_enable_thinking(form.get("enable_thinking"))
     uploads = [v for k, v in form.multi_items() if k == "files" and hasattr(v, "filename")]
     settings = request.app.state.settings
     session = get_live_session(db, session_id)
@@ -236,7 +240,7 @@ async def send_message(
         .one()
     )
     return StreamingResponse(
-        _generate(db.get_bind(), session.id, model_row.id, user_msg.id),
+        _generate(db.get_bind(), session.id, model_row.id, user_msg.id, enable_thinking),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

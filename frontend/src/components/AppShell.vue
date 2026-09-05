@@ -93,7 +93,7 @@ async function onDelete(s, ev) {
   await loadSessions()
 }
 
-async function onComposerSend({ content, files }) {
+async function onComposerSend({ content, files, enableThinking }) {
   if (!modelId.value) {
     alert('请先在设置中添加模型')
     return
@@ -109,7 +109,7 @@ async function onComposerSend({ content, files }) {
     await nextTick()
   }
   await nextTick()
-  await viewRef.value?.send({ content, files, modelId: modelId.value })
+  await viewRef.value?.send({ content, files, modelId: modelId.value, enableThinking })
 }
 
 function onSent() {
@@ -157,7 +157,7 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
             @click="onSelect(s)"
           >
             <div class="session-head">
-              <span class="session-title">{{ s.title }}</span>
+              <span class="session-title" :title="s.title">{{ s.title }}</span>
               <span class="session-actions">
                 <button
                   v-if="s.pinned"

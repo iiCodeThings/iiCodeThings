@@ -121,7 +121,7 @@ function reasoningLabel(m) {
   return reasoningOpen(m) ? '收起推理' : '推理过程'
 }
 
-async function send({ content, files, modelId }) {
+async function send({ content, files, modelId, enableThinking }) {
   if (loadPromise) await loadPromise
   if (sending.value) return
   sending.value = true
@@ -160,6 +160,7 @@ async function send({ content, files, modelId }) {
       content,
       modelId,
       files,
+      enableThinking: !!enableThinking,
       onDelta: (data) => {
         liveAsst.content += data?.text || ''
         scrollToBottom()

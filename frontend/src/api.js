@@ -160,6 +160,7 @@ export async function sendMessage({
   content,
   modelId,
   files,
+  enableThinking = false,
   onDelta,
   onReasoning,
   onTruncated,
@@ -170,6 +171,7 @@ export async function sendMessage({
   const fd = new FormData()
   fd.append('content', content ?? '')
   fd.append('model_id', String(modelId))
+  fd.append('enable_thinking', enableThinking ? 'true' : 'false')
   if (files) {
     for (const file of files) {
       fd.append('files', file)

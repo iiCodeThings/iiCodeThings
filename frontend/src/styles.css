@@ -713,6 +713,22 @@ textarea {
   padding: 0 0.15rem 0.05rem;
 }
 
+.composer-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.think-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  user-select: none;
+}
+
 .icon-btn.attach {
   position: relative;
   width: 34px;

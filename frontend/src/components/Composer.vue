@@ -14,6 +14,7 @@ const emit = defineEmits(['send'])
 const content = ref('')
 const files = ref(null)
 const fileInput = ref(null)
+const enableThinking = ref(false)
 
 const fileNames = computed(() => {
   const list = files.value
@@ -34,7 +35,7 @@ function onSend() {
   const fileList = files.value
   if (!text.trim() && (!fileList || fileList.length === 0)) return
   const snapshot = fileList ? [...fileList] : []
-  emit('send', { content: text, files: snapshot })
+  emit('send', { content: text, files: snapshot, enableThinking: enableThinking.value })
   content.value = ''
   files.value = null
   if (fileInput.value) fileInput.value.value = ''
@@ -63,17 +64,23 @@ defineExpose({ content, files, onSend })
         <li v-for="name in fileNames" :key="name">{{ name }}</li>
       </ul>
       <div class="composer-actions">
-        <label class="icon-btn attach" title="添加附件">
-          <Icon name="clip" />
-          <span class="sr-only">添加附件</span>
-          <input
-            ref="fileInput"
-            type="file"
-            multiple
-            :accept="acceptAttr"
-            @change="onFileChange"
-          />
-        </label>
+        <div class="composer-actions-left">
+          <label class="icon-btn attach" title="添加附件">
+            <Icon name="clip" />
+            <span class="sr-only">添加附件</span>
+            <input
+              ref="fileInput"
+              type="file"
+              multiple
+              :accept="acceptAttr"
+              @change="onFileChange"
+            />
+          </label>
+          <label class="think-toggle">
+            <input v-model="enableThinking" type="checkbox" name="enable_thinking" />
+            推理
+          </label>
+        </div>
         <button type="button" class="send-btn" @click="onSend">发送</button>
       </div>
     </div>

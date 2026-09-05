@@ -26,12 +26,19 @@ def _join_url(base_url: str, path: str) -> str:
     return base_url.rstrip("/") + path
 
 
+def parse_enable_thinking(raw) -> bool:
+    if raw is None:
+        return False
+    return str(raw).strip().lower() in {"true", "1", "on"}
+
+
 async def stream_chat_completion(
     *,
     base_url: str,
     api_key: str,
     model: str,
     messages: list[dict],
+    enable_thinking: bool = False,
     timeout: float = 120.0,
     client: httpx.AsyncClient | None = None,
 ) -> AsyncIterator[StreamEvent]:
@@ -39,7 +46,12 @@ async def stream_chat_completion(
     client = client or httpx.AsyncClient(timeout=timeout)
     url = _join_url(base_url, "/chat/completions")
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = {"model": model, "messages": messages, "stream": True}
+    payload = {
+        "model": model,
+        "messages": messages,
+        "stream": True,
+        "enable_thinking": enable_thinking,
+    }
     try:
         async with client.stream("POST", url, json=payload, headers=headers) as resp:
             if resp.status_code != 200:
@@ -80,6 +92,7 @@ async def chat_completion(
     api_key: str,
     model: str,
     messages: list[dict],
+    enable_thinking: bool = False,
     timeout: float = 120.0,
     client: httpx.AsyncClient | None = None,
 ) -> CompletionResult:
@@ -87,7 +100,12 @@ async def chat_completion(
     client = client or httpx.AsyncClient(timeout=timeout)
     url = _join_url(base_url, "/chat/completions")
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = {"model": model, "messages": messages, "stream": False}
+    payload = {
+        "model": model,
+        "messages": messages,
+        "stream": False,
+        "enable_thinking": enable_thinking,
+    }
     try:
         resp = await client.post(url, json=payload, headers=headers)
         if resp.status_code != 200:

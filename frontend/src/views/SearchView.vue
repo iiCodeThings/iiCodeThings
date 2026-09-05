@@ -98,7 +98,7 @@ onMounted(() => {
         <li v-for="(hit, i) in hits" :key="hit.id" class="hit-card" :style="{ '--i': i }">
           <div class="hit-head">
             <span class="hit-role" :class="hit.role">{{ hit.role === 'user' ? '问' : '答' }}</span>
-            <span class="hit-title">{{ hit.session_title || '未命名对话' }}</span>
+            <span class="hit-title" :title="hit.session_title || '未命名对话'">{{ hit.session_title || '未命名对话' }}</span>
             <span class="hit-time">{{ formatTime(hit.created_at) }}</span>
           </div>
           <div v-if="isOpen(hit.id)" class="hit-body md" v-html="renderMarkdown(hit.content)"></div>
