@@ -2,6 +2,7 @@
 import { nextTick, ref, watch } from 'vue'
 import { listMessages, sendMessage } from '../api.js'
 import { renderMarkdown } from '../markdown.js'
+import { isNearBottom } from '../paneScroll.js'
 
 const PAGE = 50
 
@@ -22,6 +23,7 @@ const loadingOlder = ref(false)
 const hasMore = ref(true)
 const sending = ref(false)
 const streamingId = ref(null)
+const stickToBottom = ref(true)
 let loadPromise = null
 let loadGen = 0
 
@@ -29,9 +31,11 @@ function numericIds() {
   return messages.value.map((m) => m.id).filter((id) => Number.isInteger(id))
 }
 
-function scrollToBottom() {
+function scrollToBottom({ force = false } = {}) {
   const el = paneEl.value
-  if (el) el.scrollTop = el.scrollHeight
+  if (!el) return
+  if (!force && !stickToBottom.value) return
+  el.scrollTop = el.scrollHeight
 }
 
 function sameId(a, b) {
@@ -62,7 +66,8 @@ async function loadLatest({ toBottom = true, scrollToHit = false } = {}) {
     if (scrollToHit && props.hitMessageId) {
       await ensureHitVisible(props.hitMessageId)
     } else if (toBottom) {
-      scrollToBottom()
+      stickToBottom.value = true
+      scrollToBottom({ force: true })
     }
   } catch (e) {
     if (gen !== loadGen) return
@@ -97,7 +102,10 @@ async function loadOlder() {
 }
 
 function onScroll() {
-  if (paneEl.value && paneEl.value.scrollTop < 48) loadOlder()
+  const el = paneEl.value
+  if (!el) return
+  stickToBottom.value = isNearBottom(el)
+  if (el.scrollTop < 48) loadOlder()
 }
 
 function toggleReasoning(id) {
@@ -148,8 +156,9 @@ async function send({ content, files, modelId, enableThinking }) {
   const liveUser = messages.value[messages.value.length - 2]
   const liveAsst = messages.value[messages.value.length - 1]
   streamingId.value = asst.id
+  stickToBottom.value = true
   await nextTick()
-  scrollToBottom()
+  scrollToBottom({ force: true })
 
   let httpError = false
   let streamError = false
@@ -189,14 +198,14 @@ async function send({ content, files, modelId, enableThinking }) {
       messages.value = messages.value.filter((m) => m !== liveUser && m !== liveAsst)
     } else if (streamError || !gotDone) {
       if (!gotDone && !streamError) error.value = error.value || '生成失败'
-      await loadLatest({ toBottom: true })
+      await loadLatest({ toBottom: stickToBottom.value })
     } else {
-      await loadLatest({ toBottom: true })
+      await loadLatest({ toBottom: stickToBottom.value })
       emit('sent')
     }
   } catch (e) {
     error.value = e.message || '发送失败'
-    await loadLatest({ toBottom: true })
+    await loadLatest({ toBottom: stickToBottom.value })
   } finally {
     sending.value = false
     streamingId.value = null
@@ -215,6 +224,7 @@ watch(
     error.value = ''
     expanded.value = new Set()
     streamingId.value = null
+    stickToBottom.value = !props.hitMessageId
     if (id) {
       loadPromise = loadLatest({ toBottom: !props.hitMessageId, scrollToHit: !!props.hitMessageId })
     }
