@@ -2,6 +2,7 @@
 import { nextTick, ref, watch } from 'vue'
 import { listMessages, sendMessage } from '../api.js'
 import { renderMarkdown } from '../markdown.js'
+import { isAwaitingReply } from '../awaitingReply.js'
 import { isNearBottom } from '../paneScroll.js'
 
 const PAGE = 50
@@ -269,6 +270,14 @@ defineExpose({ send })
         <div v-show="reasoningOpen(m)" class="reasoning-body">{{ m.reasoning }}</div>
       </div>
       <div v-if="m.model_name" class="msg-model">{{ m.model_name }}</div>
+      <div
+        v-if="isAwaitingReply({ live: isLive(m), content: m.content, reasoning: m.reasoning })"
+        class="msg-waiting"
+        aria-live="polite"
+      >
+        <span class="msg-spinner" aria-hidden="true"></span>
+        <span>正在生成</span>
+      </div>
       <div v-if="m.content" class="msg-content md" v-html="renderMarkdown(m.content)"></div>
       <ul v-if="m.attachments && m.attachments.length" class="msg-attachments">
         <li v-for="(a, i) in m.attachments" :key="a.id || i">{{ a.original_filename }}</li>

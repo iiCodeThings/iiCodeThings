@@ -312,6 +312,18 @@ textarea {
   color: var(--danger);
 }
 
+.icon-btn:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.icon-btn .msg-spinner {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  border-width: 1.5px;
+}
+
 .nav-foot {
   display: flex;
   flex-direction: column;
@@ -454,6 +466,28 @@ textarea {
   background: var(--cream);
   border: 1px solid var(--paper-line);
   border-radius: 16px 16px 16px 5px;
+}
+
+.msg-waiting {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+}
+
+.msg-spinner {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 2px solid var(--paper-line);
+  border-top-color: var(--pine);
+  border-radius: 50%;
+  animation: msg-spin 0.7s linear infinite;
+}
+
+@keyframes msg-spin {
+  to { transform: rotate(360deg); }
 }
 
 .msg-content.md {

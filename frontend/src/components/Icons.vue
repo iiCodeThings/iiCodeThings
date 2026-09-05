@@ -164,4 +164,26 @@ defineProps({
       stroke-linecap="round"
     />
   </svg>
+
+  <!-- 星芒：AI 生成标题 -->
+  <svg
+    v-else-if="name === 'spark'"
+    class="icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M12 4.2v3.4M12 16.4v3.4M4.2 12h3.4M16.4 12h3.4"
+      stroke="currentColor"
+      stroke-width="1.45"
+      stroke-linecap="round"
+    />
+    <path
+      d="M12 8.2c.7 1.4 1.8 2.5 3.2 3.2-1.4.7-2.5 1.8-3.2 3.2-.7-1.4-1.8-2.5-3.2-3.2 1.4-.7 2.5-1.8 3.2-3.2Z"
+      stroke="currentColor"
+      stroke-width="1.4"
+      stroke-linejoin="round"
+    />
+  </svg>
 </template>

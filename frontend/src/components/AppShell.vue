@@ -8,8 +8,10 @@ import {
   listSessions,
   patchSession,
   pinSession,
+  retitleSession,
   unpinSession,
 } from '../api.js'
+import { explainRetitleResult } from '../retitleFeedback.js'
 import Icon from './Icons.vue'
 
 function formatTime(iso) {
@@ -28,6 +30,7 @@ const sessions = ref([])
 const models = ref([])
 const selectedModelId = ref('')
 const viewRef = ref(null)
+const retitlingId = ref(null)
 
 const modelId = computed(() =>
   selectedModelId.value === '' ? null : Number(selectedModelId.value),
@@ -81,6 +84,29 @@ async function onRename(s, ev) {
   if (!title) return
   await patchSession(s.id, title)
   await loadSessions()
+}
+
+async function onAiTitle(s, ev) {
+  ev.stopPropagation()
+  if (!modelId.value) {
+    alert('请先在设置中添加模型')
+    return
+  }
+  if (retitlingId.value != null) return
+  retitlingId.value = s.id
+  try {
+    const result = await retitleSession(s.id, modelId.value)
+    const feedback = explainRetitleResult(result)
+    if (!feedback.ok) {
+      alert(feedback.message)
+      return
+    }
+    await loadSessions()
+  } catch (e) {
+    alert(e.message || '生成标题失败')
+  } finally {
+    retitlingId.value = null
+  }
 }
 
 async function onDelete(s, ev) {
@@ -174,6 +200,17 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
                 </button>
                 <button type="button" class="icon-btn" title="重命名" aria-label="重命名" @click="onRename(s, $event)">
                   <Icon name="quill" />
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn"
+                  title="用 AI 生成标题"
+                  aria-label="用 AI 生成标题"
+                  :disabled="retitlingId != null"
+                  @click="onAiTitle(s, $event)"
+                >
+                  <span v-if="retitlingId === s.id" class="msg-spinner" aria-hidden="true"></span>
+                  <Icon v-else name="spark" />
                 </button>
                 <button type="button" class="icon-btn danger" title="删除" aria-label="删除" @click="onDelete(s, $event)">
                   <Icon name="inkx" />
