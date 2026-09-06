@@ -21,4 +21,27 @@ describe('renderMarkdown', () => {
     const html = renderMarkdown('上\n下')
     expect(html).toContain('<br')
   })
+
+  it('emphasizes text wrapped in CJK quotation marks', () => {
+    const html = renderMarkdown(
+      '[这种持续的压力会耗尽心理资源，导致**“情绪耗竭”**，表现出的就是对什么都提不起劲]',
+    )
+    expect(html).toContain('<strong>')
+    expect(html).toContain('情绪耗竭')
+    expect(html).not.toContain('**')
+  })
+
+  it('emphasizes CJK-quoted phrases without surrounding brackets', () => {
+    const html = renderMarkdown('导致**“情绪耗竭”**，表现')
+    expect(html).toContain('<strong>')
+    expect(html).toContain('情绪耗竭')
+    expect(html).not.toContain('**')
+  })
+
+  it('leaves emphasis markers intact inside code', () => {
+    const html = renderMarkdown('看 `导致**“情绪耗竭”**`')
+    expect(html).toContain('<code>')
+    expect(html).toContain('**')
+    expect(html).not.toMatch(/<code>[^<]*<strong>/)
+  })
 })
