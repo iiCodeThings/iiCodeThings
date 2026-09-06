@@ -9,7 +9,11 @@ export async function jsonFetch(url, options = {}) {
       ...(options.headers || {}),
     },
   })
-  if (res.status === 401 && !window.location.pathname.startsWith('/login')) {
+  if (
+    res.status === 401 &&
+    !window.location.pathname.startsWith('/login') &&
+    !window.location.pathname.startsWith('/s/')
+  ) {
     window.location = '/login'
     throw new Error('unauthorized')
   }
@@ -84,6 +88,38 @@ export async function unpinSession(id) {
   const res = await jsonFetch(`/api/sessions/${id}/pin`, { method: 'DELETE' })
   if (!res.ok) throw new Error('取消置顶失败')
   return res.json()
+}
+
+export async function shareSession(id) {
+  const res = await jsonFetch(`/api/sessions/${id}/share`, { method: 'POST' })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(typeof data.detail === 'string' ? data.detail : '生成分享链接失败')
+  }
+  return data
+}
+
+export async function shareTurn(sessionId, userMessageId) {
+  const res = await jsonFetch(`/api/sessions/${sessionId}/share/turn`, {
+    method: 'POST',
+    body: JSON.stringify({ user_message_id: userMessageId }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(typeof data.detail === 'string' ? data.detail : '生成分享链接失败')
+  }
+  return data
+}
+
+export async function fetchShare(token) {
+  const res = await fetch(`/api/shares/${encodeURIComponent(token)}`)
+  if (res.status === 404) throw new Error('这篇分享不存在或已失效')
+  if (!res.ok) throw new Error('无法打开分享')
+  return res.json()
+}
+
+export function absoluteShareUrl(path) {
+  return `${window.location.origin}${path}`
 }
 
 export async function retitleSession(id, modelId) {
@@ -182,7 +218,11 @@ export async function sendMessage({
     credentials: 'include',
     body: fd,
   })
-  if (res.status === 401 && !window.location.pathname.startsWith('/login')) {
+  if (
+    res.status === 401 &&
+    !window.location.pathname.startsWith('/login') &&
+    !window.location.pathname.startsWith('/s/')
+  ) {
     window.location = '/login'
     throw new Error('unauthorized')
   }

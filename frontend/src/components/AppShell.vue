@@ -9,9 +9,11 @@ import {
   patchSession,
   pinSession,
   retitleSession,
+  shareSession,
   unpinSession,
 } from '../api.js'
 import { explainRetitleResult } from '../retitleFeedback.js'
+import { copySharePath } from '../shareLink.js'
 import Icon from './Icons.vue'
 
 function formatTime(iso) {
@@ -84,6 +86,17 @@ async function onRename(s, ev) {
   if (!title) return
   await patchSession(s.id, title)
   await loadSessions()
+}
+
+async function onShareSession(s, ev) {
+  ev.stopPropagation()
+  try {
+    const result = await shareSession(s.id)
+    await copySharePath(result.path)
+    alert('分享链接已复制')
+  } catch (e) {
+    alert(e.message || '生成分享链接失败')
+  }
 }
 
 async function onAiTitle(s, ev) {
@@ -200,6 +213,15 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
                 </button>
                 <button type="button" class="icon-btn" title="重命名" aria-label="重命名" @click="onRename(s, $event)">
                   <Icon name="quill" />
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn"
+                  title="分享会话"
+                  aria-label="分享会话"
+                  @click="onShareSession(s, $event)"
+                >
+                  <Icon name="link" />
                 </button>
                 <button
                   type="button"

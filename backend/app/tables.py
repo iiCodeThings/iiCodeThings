@@ -86,3 +86,16 @@ class Attachment(Base):
     extracted_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     message: Mapped["Message"] = relationship(back_populates="attachments")
+
+
+class Share(Base):
+    __tablename__ = "shares"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    token: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    session_id: Mapped[int] = mapped_column(
+        ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_message_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

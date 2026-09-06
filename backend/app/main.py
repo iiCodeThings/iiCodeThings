@@ -23,12 +23,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     from app.routers import messages as messages_router
     from app.routers import search as search_router
     from app.routers import sessions as sessions_router
+    from app.routers import shares as shares_router
 
     app.include_router(auth_router.router)
     app.include_router(llm_models_router.router)
     app.include_router(sessions_router.router)
     app.include_router(messages_router.router)
     app.include_router(search_router.router)
+    app.include_router(shares_router.router)
 
     from app.db import SessionLocal
 

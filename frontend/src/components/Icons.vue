@@ -186,4 +186,32 @@ defineProps({
       stroke-linejoin="round"
     />
   </svg>
+
+  <!-- 链接：分享 -->
+  <svg
+    v-else-if="name === 'link'"
+    class="icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M9.2 14.8l5.6-5.6"
+      stroke="currentColor"
+      stroke-width="1.45"
+      stroke-linecap="round"
+    />
+    <path
+      d="M8.4 11.2a3.4 3.4 0 0 1 0-4.8l1.2-1.2a3.4 3.4 0 0 1 4.8 0"
+      stroke="currentColor"
+      stroke-width="1.45"
+      stroke-linecap="round"
+    />
+    <path
+      d="M15.6 12.8a3.4 3.4 0 0 1 0 4.8l-1.2 1.2a3.4 3.4 0 1 1-4.8-4.8"
+      stroke="currentColor"
+      stroke-width="1.45"
+      stroke-linecap="round"
+    />
+  </svg>
 </template>

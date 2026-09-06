@@ -6,6 +6,7 @@ import LoginView from './views/LoginView.vue'
 import ChatView from './views/ChatView.vue'
 import SearchView from './views/SearchView.vue'
 import SettingsView from './views/SettingsView.vue'
+import ShareView from './views/ShareView.vue'
 import './styles.css'
 
 const router = createRouter({
@@ -13,6 +14,7 @@ const router = createRouter({
   routes: [
     { path: '/login', component: LoginView },
     { path: '/search', component: SearchView },
+    { path: '/s/:token', component: ShareView },
     {
       path: '/',
       component: AppShell,

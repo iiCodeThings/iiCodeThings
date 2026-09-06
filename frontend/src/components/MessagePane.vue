@@ -1,6 +1,7 @@
 <script setup>
 import { nextTick, ref, watch } from 'vue'
-import { listMessages, sendMessage } from '../api.js'
+import { listMessages, sendMessage, shareTurn } from '../api.js'
+import { copySharePath } from '../shareLink.js'
 import { renderMarkdown } from '../markdown.js'
 import { isAwaitingReply } from '../awaitingReply.js'
 import { isNearBottom } from '../paneScroll.js'
@@ -128,6 +129,30 @@ function reasoningOpen(m) {
 function reasoningLabel(m) {
   if (isLive(m)) return '正在推理'
   return reasoningOpen(m) ? '收起推理' : '推理过程'
+}
+
+function precedingUserId(asst) {
+  const idx = messages.value.findIndex((row) => sameId(row.id, asst.id))
+  for (let i = idx - 1; i >= 0; i -= 1) {
+    const row = messages.value[i]
+    if (row.role === 'user' && Number.isInteger(row.id)) return row.id
+  }
+  return null
+}
+
+async function onShareTurn(m) {
+  const userId = precedingUserId(m)
+  if (userId == null) {
+    alert('找不到对应的问题，无法分享')
+    return
+  }
+  try {
+    const result = await shareTurn(props.sessionId, userId)
+    await copySharePath(result.path)
+    alert('分享链接已复制')
+  } catch (e) {
+    alert(e.message || '生成分享链接失败')
+  }
 }
 
 async function send({ content, files, modelId, enableThinking }) {
@@ -270,6 +295,14 @@ defineExpose({ send })
         <div v-show="reasoningOpen(m)" class="reasoning-body">{{ m.reasoning }}</div>
       </div>
       <div v-if="m.model_name" class="msg-model">{{ m.model_name }}</div>
+      <button
+        v-if="m.role === 'assistant' && Number.isInteger(m.id) && !isLive(m)"
+        type="button"
+        class="msg-share"
+        @click="onShareTurn(m)"
+      >
+        分享这轮
+      </button>
       <div
         v-if="isAwaitingReply({ live: isLive(m), content: m.content, reasoning: m.reasoning })"
         class="msg-waiting"
