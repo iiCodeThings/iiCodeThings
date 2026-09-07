@@ -23,42 +23,33 @@ function stripScripts(html) {
   return html.replace(/<script\b[\s\S]*?>[\s\S]*?<\/script>/gi, '')
 }
 
-const WRAP_PAIRS = [
-  ['“', '”'],
-  ['‘', '’'],
-  ['「', '」'],
-  ['『', '』'],
-  ['（', '）'],
-  ['【', '】'],
-  ['《', '》'],
-  ['〈', '〉'],
-  ['〔', '〕'],
-  ['(', ')'],
-  ['"', '"'],
-  ["'", "'"],
-]
+const ZWSP = '\u200b'
+const PUNCT_RE = /\p{P}/u
 
-const EMPHASIS_MARKERS = ['***', '___', '**', '__', '*', '_']
-
-function escapeRe(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+function isPunct(ch) {
+  return Boolean(ch) && PUNCT_RE.test(ch)
 }
 
-function unwrapPunctEmphasis(text) {
-  let result = text
-  for (const marker of EMPHASIS_MARKERS) {
-    const m = escapeRe(marker)
-    const pre = marker.includes('*') ? '(?<!\\*)' : '(?<!_)'
-    const post = marker.includes('*') ? '(?!\\*)' : '(?!_)'
-    for (const [open, close] of WRAP_PAIRS) {
-      const re = new RegExp(
-        `${pre}${m}${escapeRe(open)}([^\\n]*?)${escapeRe(close)}${m}${post}`,
-        'g',
-      )
-      result = result.replace(re, `${open}${marker}$1${marker}${close}`)
+function relaxEmphasisFlanking(text) {
+  let out = ''
+  let i = 0
+  while (i < text.length) {
+    const ch = text[i]
+    if (ch !== '*' && ch !== '_') {
+      out += ch
+      i += 1
+      continue
     }
+    let j = i
+    while (j < text.length && text[j] === ch) j += 1
+    const prev = i > 0 ? text[i - 1] : ''
+    const next = j < text.length ? text[j] : ''
+    if (isPunct(prev) && !out.endsWith(ZWSP)) out += ZWSP
+    out += text.slice(i, j)
+    if (isPunct(next)) out += ZWSP
+    i = j
   }
-  return result
+  return out
 }
 
 function mapOutsideCode(src, transform) {
@@ -76,8 +67,11 @@ function mapOutsideCode(src, transform) {
 }
 
 export function renderMarkdown(src) {
-  const prepared = mapOutsideCode(String(src || ''), unwrapPunctEmphasis)
-  const html = String(marked.parse(prepared, { async: false, gfm: true, breaks: true }))
+  const prepared = mapOutsideCode(String(src || ''), relaxEmphasisFlanking)
+  const html = String(marked.parse(prepared, { async: false, gfm: true, breaks: true })).replaceAll(
+    ZWSP,
+    '',
+  )
   const p = getPurify()
   const cleaned = p
     ? p.sanitize(html, {

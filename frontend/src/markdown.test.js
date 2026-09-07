@@ -44,4 +44,21 @@ describe('renderMarkdown', () => {
     expect(html).toContain('**')
     expect(html).not.toMatch(/<code>[^<]*<strong>/)
   })
+
+  it('emphasizes two CJK-quoted phrases in one sentence', () => {
+    const html = renderMarkdown(
+      '而**“社会网络”（Social Network）**，恰恰是把这三者缝合起来的那个**“中观连接器”**。',
+    )
+    expect(html).toContain('<strong>')
+    expect(html).toContain('社会网络')
+    expect(html).toContain('中观连接器')
+    expect(html).not.toContain('**')
+  })
+
+  it('emphasizes when the closing quote sits outside the markers', () => {
+    const html = renderMarkdown('那个**“中观连接器**”。')
+    expect(html).toContain('<strong>')
+    expect(html).toContain('中观连接器')
+    expect(html).not.toContain('**')
+  })
 })
