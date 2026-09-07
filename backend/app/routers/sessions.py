@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.db import get_db
 from app.deps import get_current_user
 from app.services.retitle import TitleGenerationError, generate_session_title
+from app.services.turns import find_turn, public_message
 from app.tables import ChatSession, LlmModel, Message, User
 from app.title import turns_from_messages
 
@@ -85,6 +86,29 @@ def patch_session(
     db.commit()
     db.refresh(row)
     return _out(row)
+
+
+@router.get("/{session_id}/turns/{message_id}")
+def get_turn(
+    session_id: int,
+    message_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    session = get_live_session(db, session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="会话不存在")
+    found = find_turn(db, session.id, message_id)
+    if found is None:
+        raise HTTPException(status_code=404, detail="这一轮不存在")
+    user_msg, asst = found
+    messages = [user_msg] + ([asst] if asst else [])
+    return {
+        "title": session.title,
+        "kind": "turn",
+        "user_message_id": user_msg.id,
+        "messages": [public_message(m) for m in messages],
+    }
 
 
 @router.delete("/{session_id}")
