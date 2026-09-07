@@ -104,9 +104,9 @@ onMounted(() => {
               <span class="hit-title" :title="hit.session_title || '未命名对话'">{{ hit.session_title || '未命名对话' }}</span>
               <span class="hit-time">{{ formatTime(hit.created_at) }}</span>
             </div>
-            <div v-if="isOpen(hit.id)" class="hit-body md" v-html="renderMarkdown(hit.content)"></div>
-            <p v-else class="hit-preview">{{ previewText(hit.content).text }}</p>
+            <p v-if="!isOpen(hit.id)" class="hit-preview">{{ previewText(hit.content).text }}</p>
           </RouterLink>
+          <div v-if="isOpen(hit.id)" class="hit-body md" v-html="renderMarkdown(hit.content)"></div>
           <button
             v-if="previewText(hit.content).more || isOpen(hit.id)"
             type="button"
