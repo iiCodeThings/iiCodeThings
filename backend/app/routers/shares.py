@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.db import get_db
 from app.deps import get_current_user
 from app.routers.sessions import get_live_session
+from app.services.turns import public_message
 from app.tables import Message, Share, User
 
 router = APIRouter(tags=["shares"])
@@ -20,17 +21,6 @@ class TurnShareIn(BaseModel):
 
 def _share_out(row: Share) -> dict:
     return {"token": row.token, "path": f"/s/{row.token}"}
-
-
-def _public_message(msg: Message) -> dict:
-    return {
-        "role": msg.role,
-        "content": msg.content or "",
-        "model_name": msg.model_name,
-        "attachments": [
-            {"kind": a.kind, "original_filename": a.original_filename} for a in msg.attachments
-        ],
-    }
 
 
 def _get_or_create_share(
@@ -133,5 +123,5 @@ def get_share(token: str, db: Session = Depends(get_db)):
     return {
         "kind": row.kind,
         "title": session.title,
-        "messages": [_public_message(m) for m in messages],
+        "messages": [public_message(m) for m in messages],
     }
