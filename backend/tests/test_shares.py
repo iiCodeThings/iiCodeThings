@@ -101,6 +101,29 @@ def test_share_deleted_session_404(client, db, settings):
     assert r.status_code == 404
 
 
+def test_turn_share_question_without_answer(client, db, settings):
+    _login(client, db, settings)
+    session_id = client.post("/api/sessions").json()["id"]
+    user = Message(
+        session_id=session_id,
+        role="user",
+        content="只有问",
+        model_name="Display",
+        model="api-id",
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    token = client.post(
+        f"/api/sessions/{session_id}/share/turn",
+        json={"user_message_id": user.id},
+    ).json()["token"]
+    client.cookies.clear()
+    data = client.get(f"/api/shares/{token}").json()
+    assert data["kind"] == "turn"
+    assert [m["content"] for m in data["messages"]] == ["只有问"]
+
+
 def test_turn_share_rejects_foreign_message(client, db, settings):
     _login(client, db, settings)
     a = client.post("/api/sessions").json()["id"]

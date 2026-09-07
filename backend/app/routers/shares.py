@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.db import get_db
 from app.deps import get_current_user
 from app.routers.sessions import get_live_session
-from app.services.turns import public_message
+from app.services.turns import find_turn, public_message
 from app.tables import Message, Share, User
 
 router = APIRouter(tags=["shares"])
@@ -53,35 +53,20 @@ def _resolve_share(db: Session, token: str) -> tuple:
     session = get_live_session(db, row.session_id)
     if session is None:
         raise HTTPException(status_code=404, detail="分享不存在")
-    q = (
-        db.query(Message)
-        .options(selectinload(Message.attachments))
-        .filter(Message.session_id == session.id)
-        .order_by(Message.id.asc())
-    )
     if row.kind == "session":
+        q = (
+            db.query(Message)
+            .options(selectinload(Message.attachments))
+            .filter(Message.session_id == session.id)
+            .order_by(Message.id.asc())
+        )
         messages = q.all()
     else:
-        user = (
-            db.query(Message)
-            .options(selectinload(Message.attachments))
-            .filter(Message.id == row.user_message_id)
-            .first()
-        )
-        if user is None or user.session_id != session.id or user.role != "user":
+        found = find_turn(db, session.id, row.user_message_id)
+        if found is None:
             raise HTTPException(status_code=404, detail="分享不存在")
-        asst = (
-            db.query(Message)
-            .options(selectinload(Message.attachments))
-            .filter(
-                Message.session_id == session.id,
-                Message.id > user.id,
-                Message.role == "assistant",
-            )
-            .order_by(Message.id.asc())
-            .first()
-        )
-        messages = [user] + ([asst] if asst else [])
+        user_msg, asst = found
+        messages = [user_msg] + ([asst] if asst else [])
     return session, row, messages
 
 
