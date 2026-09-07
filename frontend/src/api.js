@@ -118,6 +118,13 @@ export async function fetchShare(token) {
   return res.json()
 }
 
+export async function fetchTurn(sessionId, messageId) {
+  const res = await jsonFetch(`/api/sessions/${sessionId}/turns/${messageId}`)
+  if (res.status === 404) throw new Error('这一轮不存在')
+  if (!res.ok) throw new Error('无法打开')
+  return res.json()
+}
+
 export function absoluteShareUrl(path) {
   return `${window.location.origin}${path}`
 }
