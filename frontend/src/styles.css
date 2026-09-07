@@ -1145,6 +1145,24 @@ textarea {
   gap: 1rem;
 }
 
+.share-make-link {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.share-make-link:hover {
+  color: var(--pine);
+}
+
 .share-kicker {
   margin: 0 0 0.55rem;
   font-size: 0.72rem;
