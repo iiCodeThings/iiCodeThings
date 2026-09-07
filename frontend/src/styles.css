@@ -1138,6 +1138,13 @@ textarea {
   border-bottom: 1px solid var(--paper-line);
 }
 
+.share-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .share-kicker {
   margin: 0 0 0.55rem;
   font-size: 0.72rem;

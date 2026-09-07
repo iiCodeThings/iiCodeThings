@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { fetchShare } from '../api.js'
-import { renderMarkdown } from '../markdown.js'
+import ShareArticle from '../components/ShareArticle.vue'
 
 const route = useRoute()
 const title = ref('')
@@ -27,20 +27,13 @@ onMounted(async () => {
 
 <template>
   <div class="share-page">
-    <article v-if="!loading && !error" class="share-article">
-      <header class="share-header">
-        <p class="share-kicker">{{ kind === 'turn' ? '一问一答' : '对话全文' }}</p>
-        <h1>{{ title }}</h1>
-      </header>
-      <section v-for="(m, i) in messages" :key="i" class="share-block" :class="m.role">
-        <p class="share-label">{{ m.role === 'user' ? '问' : '答' }}</p>
-        <div v-if="m.content" class="share-body md" v-html="renderMarkdown(m.content)"></div>
-        <ul v-if="m.attachments && m.attachments.length" class="share-files">
-          <li v-for="(a, j) in m.attachments" :key="j">{{ a.original_filename }}</li>
-        </ul>
-      </section>
-      <footer class="share-foot">只读分享</footer>
-    </article>
+    <ShareArticle
+      v-if="!loading && !error"
+      :title="title"
+      :kind="kind"
+      :messages="messages"
+      footer="只读分享"
+    />
     <p v-else-if="loading" class="share-status">载入中…</p>
     <p v-else class="share-status">{{ error }}</p>
   </div>
