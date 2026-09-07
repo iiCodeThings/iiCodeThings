@@ -1,9 +1,11 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 import { searchMessages } from '../api.js'
 import Icon from '../components/Icons.vue'
 import { renderMarkdown } from '../markdown.js'
 import { previewText } from '../searchPreview.js'
+import { turnPath } from '../turnPath.js'
 
 const q = ref('')
 const hits = ref([])
@@ -96,13 +98,15 @@ onMounted(() => {
       </p>
       <TransitionGroup v-if="hits.length" name="hit" tag="ul" class="hit-list">
         <li v-for="(hit, i) in hits" :key="hit.id" class="hit-card" :style="{ '--i': i }">
-          <div class="hit-head">
-            <span class="hit-role" :class="hit.role">{{ hit.role === 'user' ? '问' : '答' }}</span>
-            <span class="hit-title" :title="hit.session_title || '未命名对话'">{{ hit.session_title || '未命名对话' }}</span>
-            <span class="hit-time">{{ formatTime(hit.created_at) }}</span>
-          </div>
-          <div v-if="isOpen(hit.id)" class="hit-body md" v-html="renderMarkdown(hit.content)"></div>
-          <p v-else class="hit-preview">{{ previewText(hit.content).text }}</p>
+          <RouterLink class="hit-link" :to="turnPath(hit.session_id, hit.id)">
+            <div class="hit-head">
+              <span class="hit-role" :class="hit.role">{{ hit.role === 'user' ? '问' : '答' }}</span>
+              <span class="hit-title" :title="hit.session_title || '未命名对话'">{{ hit.session_title || '未命名对话' }}</span>
+              <span class="hit-time">{{ formatTime(hit.created_at) }}</span>
+            </div>
+            <div v-if="isOpen(hit.id)" class="hit-body md" v-html="renderMarkdown(hit.content)"></div>
+            <p v-else class="hit-preview">{{ previewText(hit.content).text }}</p>
+          </RouterLink>
           <button
             v-if="previewText(hit.content).more || isOpen(hit.id)"
             type="button"
@@ -110,7 +114,7 @@ onMounted(() => {
             :class="{ open: isOpen(hit.id) }"
             :aria-label="isOpen(hit.id) ? '收起' : '展开全文'"
             :title="isOpen(hit.id) ? '收起' : '展开全文'"
-            @click="toggle(hit.id)"
+            @click.stop="toggle(hit.id)"
           >
             <Icon name="more" />
           </button>
