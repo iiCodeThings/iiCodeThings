@@ -6,6 +6,7 @@ import { parseNewSessionCommand } from '../newSessionCommand.js'
 import {
   completeSlashCommand,
   matchSlashCommands,
+  parseSearchCommand,
   slashCommandDraft,
 } from '../slashCommands.js'
 import Icon from './Icons.vue'
@@ -56,7 +57,7 @@ function onFileChange(e) {
 
 function onSend() {
   const text = content.value
-  if (parseNewSessionCommand(text)) {
+  if (parseNewSessionCommand(text) || parseSearchCommand(text)) {
     emit('send', { content: text, files: [], enableThinking: enableThinking.value })
     content.value = ''
     files.value = null

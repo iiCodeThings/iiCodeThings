@@ -171,11 +171,15 @@ describe('/new-session intercept', () => {
     const body = functionBody(scriptSetup(composer), 'onSend')
     expect(body).toBeTruthy()
     const parseIdx = body.indexOf('parseNewSessionCommand')
+    const searchIdx = body.indexOf('parseSearchCommand')
     const modelIdx = body.indexOf('props.modelId')
     expect(parseIdx).toBeGreaterThan(-1)
+    expect(searchIdx).toBeGreaterThan(-1)
     expect(modelIdx).toBeGreaterThan(-1)
     expect(parseIdx).toBeLessThan(modelIdx)
+    expect(searchIdx).toBeLessThan(modelIdx)
     expect(body.slice(parseIdx, modelIdx)).toContain('files: []')
+    expect(body.slice(searchIdx, modelIdx)).toContain('files: []')
   })
 
   it('AppShell onComposerSend routes the command to onNewChat without sending to the view', () => {
@@ -187,6 +191,21 @@ describe('/new-session intercept', () => {
     expect(newChatIdx).toBeGreaterThan(-1)
     expect(retIdx).toBeGreaterThan(newChatIdx)
     expect(body.slice(0, retIdx)).not.toContain('viewRef.value?.send')
+  })
+
+  it('AppShell onComposerSend routes /search before the model check and does not send', () => {
+    const body = functionBody(scriptSetup(appShell), 'onComposerSend')
+    expect(body).toBeTruthy()
+    const searchIdx = body.indexOf('parseSearchCommand')
+    const modelIdx = body.indexOf('modelId.value')
+    const sendIdx = body.indexOf('viewRef.value?.send')
+    expect(searchIdx).toBeGreaterThan(-1)
+    expect(modelIdx).toBeGreaterThan(-1)
+    expect(searchIdx).toBeLessThan(modelIdx)
+    expect(body.slice(searchIdx, modelIdx)).toContain("router.push('/search')")
+    expect(body.slice(searchIdx, modelIdx)).toContain('return')
+    expect(body.slice(searchIdx, modelIdx)).not.toContain('viewRef.value?.send')
+    expect(sendIdx).toBeGreaterThan(modelIdx)
   })
 
   it('onNewChat PATCHes a truthy title and still selects if PATCH throws', () => {
