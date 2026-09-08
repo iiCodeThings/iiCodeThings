@@ -207,16 +207,16 @@ function onSent() {
 }
 
 onMounted(async () => {
-  try {
-    await Promise.all([loadSessions(), loadModels()])
-  } catch {
-    /* 401 redirects via jsonFetch */
-  }
   narrowMq = window.matchMedia(NARROW_QUERY)
   applyNarrow()
   narrowMq.addEventListener('change', applyNarrow)
   window.addEventListener('keydown', onDrawerKey)
   document.addEventListener('pointerdown', onDocPointer)
+  try {
+    await Promise.all([loadSessions(), loadModels()])
+  } catch {
+    /* 401 redirects via jsonFetch */
+  }
 })
 
 onUnmounted(() => {
