@@ -1,0 +1,50 @@
+import { describe, expect, it } from 'vitest'
+import {
+  NARROW_QUERY,
+  isNarrowViewport,
+  nextDrawerOpen,
+  sessionActionsMode,
+} from './layout.js'
+
+describe('isNarrowViewport', () => {
+  it('is true below 720px', () => {
+    expect(isNarrowViewport(319)).toBe(true)
+    expect(isNarrowViewport(719.98)).toBe(true)
+    expect(isNarrowViewport(719.99)).toBe(true)
+  })
+
+  it('is false at 720px and above', () => {
+    expect(isNarrowViewport(720)).toBe(false)
+    expect(isNarrowViewport(1280)).toBe(false)
+  })
+})
+
+describe('NARROW_QUERY', () => {
+  it('matches the CSS breakpoint', () => {
+    expect(NARROW_QUERY).toBe('(max-width: 719.98px)')
+  })
+})
+
+describe('sessionActionsMode', () => {
+  it('uses a more menu on narrow, icons on desktop', () => {
+    expect(sessionActionsMode(true)).toBe('menu')
+    expect(sessionActionsMode(false)).toBe('icons')
+  })
+})
+
+describe('nextDrawerOpen', () => {
+  it('always closes when not narrow', () => {
+    expect(nextDrawerOpen({ open: true, narrow: false, action: 'toggle' })).toBe(false)
+    expect(nextDrawerOpen({ open: true, narrow: false, action: 'widen' })).toBe(false)
+  })
+
+  it('toggles, opens, and closes on narrow', () => {
+    expect(nextDrawerOpen({ open: false, narrow: true, action: 'toggle' })).toBe(true)
+    expect(nextDrawerOpen({ open: true, narrow: true, action: 'toggle' })).toBe(false)
+    expect(nextDrawerOpen({ open: false, narrow: true, action: 'open' })).toBe(true)
+    expect(nextDrawerOpen({ open: true, narrow: true, action: 'select' })).toBe(false)
+    expect(nextDrawerOpen({ open: true, narrow: true, action: 'backdrop' })).toBe(false)
+    expect(nextDrawerOpen({ open: true, narrow: true, action: 'escape' })).toBe(false)
+    expect(nextDrawerOpen({ open: true, narrow: true, action: 'close' })).toBe(false)
+  })
+})
