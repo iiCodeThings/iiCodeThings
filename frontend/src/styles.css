@@ -224,6 +224,10 @@ textarea {
   overflow: auto;
 }
 
+.session-list.menu-open {
+  overflow: visible;
+}
+
 .session-list li {
   padding: 0.55rem 0.55rem 0.5rem;
   border-radius: 12px;
@@ -416,7 +420,7 @@ textarea {
   text-underline-offset: 0.2em;
 }
 
-.chat-topbar {
+.right > .chat-topbar {
   display: none;
 }
 
@@ -1317,11 +1321,15 @@ textarea {
 }
 
 @media (max-width: 719.98px) {
-  .chat-topbar {
+  .right > .chat-topbar {
     display: flex;
+    flex: 0 0 auto;
+    flex-direction: row;
     align-items: center;
     gap: 0.55rem;
     flex-shrink: 0;
+    position: relative;
+    z-index: 25;
     min-height: 48px;
     padding: 0.45rem 0.75rem;
     padding-top: calc(0.45rem + env(safe-area-inset-top, 0px));
@@ -1423,6 +1431,7 @@ textarea {
 
   .session-list .session-actions.menu {
     display: flex;
+    opacity: 1;
   }
 
   .more-btn {

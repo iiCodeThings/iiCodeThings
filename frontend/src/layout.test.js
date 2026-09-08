@@ -126,4 +126,41 @@ describe('narrow session more menu', () => {
     expect(mediaIdx).toBeGreaterThan(-1)
     expect(ruleIdx).toBeLessThan(mediaIdx)
   })
+
+  it('unclips the session list while a more menu is open', () => {
+    expect(appShell).toContain("class=\"session-list\" :class=\"{ 'menu-open': menuOpenId != null }\"")
+    expect(styles).toContain(`.session-list.menu-open {
+  overflow: visible;
+}`)
+  })
+})
+
+describe('chat topbar stacking and flex', () => {
+  it('hides the topbar on desktop with higher specificity than .right > *', () => {
+    const hideIdx = styles.indexOf('.right > .chat-topbar {\n  display: none;\n}')
+    const starIdx = styles.indexOf('.right > * {')
+    expect(hideIdx).toBeGreaterThan(-1)
+    expect(starIdx).toBeGreaterThan(-1)
+  })
+
+  it('keeps the narrow topbar a horizontal bar above the backdrop', () => {
+    const mediaIdx = styles.indexOf('@media (max-width: 719.98px)')
+    const media = styles.slice(mediaIdx)
+    expect(media).toContain('.right > .chat-topbar {')
+    expect(media).toMatch(/flex:\s*0 0 auto/)
+    expect(media).toMatch(/flex-direction:\s*row/)
+    expect(media).toMatch(/z-index:\s*25/)
+    expect(media).toMatch(/position:\s*relative/)
+  })
+})
+
+describe('narrow drawer settings and more-menu opacity', () => {
+  it('closes the drawer when opening settings', () => {
+    expect(appShell).toMatch(/<RouterLink[^>]*to="\/settings"[^>]*@click="setDrawer\('close'\)"/)
+  })
+
+  it('shows the more action at full opacity on narrow', () => {
+    const media = styles.slice(styles.indexOf('@media (max-width: 719.98px)'))
+    expect(media).toMatch(/\.session-list \.session-actions\.menu \{[\s\S]*?opacity:\s*1;/)
+  })
 })

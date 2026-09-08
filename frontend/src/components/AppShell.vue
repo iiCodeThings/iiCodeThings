@@ -268,7 +268,7 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           <span class="brand-name">对话</span>
         </div>
         <button type="button" class="new-chat" @click="onNewChat">新对话</button>
-        <ul class="session-list">
+        <ul class="session-list" :class="{ 'menu-open': menuOpenId != null }">
           <li
             v-for="s in sessions"
             :key="s.id"
@@ -359,7 +359,7 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
               <option v-for="m in models" :key="m.id" :value="String(m.id)">{{ m.name }}</option>
             </select>
           </label>
-          <RouterLink class="settings-link" to="/settings">设置</RouterLink>
+          <RouterLink class="settings-link" to="/settings" @click="setDrawer('close')">设置</RouterLink>
         </div>
       </div>
     </aside>
