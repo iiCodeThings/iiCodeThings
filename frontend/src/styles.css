@@ -761,6 +761,7 @@ textarea {
 }
 
 .composer-box {
+  position: relative;
   background: var(--cream);
   border: 1px solid var(--paper-line);
   border-radius: var(--radius);
@@ -769,6 +770,52 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.slash-suggest {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  z-index: 6;
+  margin: 0 0 0.35rem;
+  padding: 0.25rem 0;
+  list-style: none;
+  background: var(--cream);
+  border: 1px solid var(--paper-line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.slash-suggest button {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  gap: 0.65rem;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 0.55rem 0.8rem;
+  min-height: 44px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.slash-suggest li.active button,
+.slash-suggest button:hover,
+.slash-suggest button:focus {
+  background: rgba(36, 85, 68, 0.08);
+}
+
+.slash-cmd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88rem;
+  color: var(--pine);
+}
+
+.slash-hint {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
 }
 
 .composer-box textarea {
@@ -1435,5 +1482,9 @@ textarea {
   .message-pane {
     padding-left: 0.85rem;
     padding-right: 0.85rem;
+  }
+
+  .slash-suggest button {
+    min-height: 44px;
   }
 }

@@ -145,6 +145,27 @@ describe('narrow drawer settings and more-menu opacity', () => {
   })
 })
 
+describe('slash command autocomplete', () => {
+  it('renders a listbox of slash suggestions above the textarea', () => {
+    expect(composer).toContain('class="slash-suggest"')
+    expect(composer).toContain('role="listbox"')
+    expect(composer).toContain('role="option"')
+    expect(composer).toContain('aria-expanded')
+    expect(composer).toContain('completeSlashCommand')
+    expect(composer).toContain("e.key === 'ArrowDown'")
+    expect(composer).toContain("e.key === 'ArrowUp'")
+    expect(composer).toContain("e.key === 'Escape'")
+    expect(composer).toContain('mousedown.prevent')
+  })
+
+  it('places slash-suggest CSS above the composer box', () => {
+    expect(styles).toContain('.composer-box {')
+    expect(styles).toMatch(/\.composer-box \{[\s\S]*?position:\s*relative;/)
+    expect(styles).toContain('.slash-suggest {')
+    expect(styles).toMatch(/\.slash-suggest \{[\s\S]*?bottom:\s*100%;/)
+  })
+})
+
 describe('/new-session intercept', () => {
   it('Composer parses the command before the modelId check and emits empty files', () => {
     const body = functionBody(scriptSetup(composer), 'onSend')
