@@ -104,14 +104,19 @@ async function loadModels() {
 
 async function onNewChat(title) {
   const s = await createSession()
-  if (title) {
-    await patchSession(s.id, title.slice(0, 128))
+  try {
+    if (title) {
+      await patchSession(s.id, title.slice(0, 128))
+    }
+  } catch (e) {
+    alert(e.message || '设置标题失败')
+  } finally {
+    await loadSessions()
+    currentId.value = s.id
+    menuOpenId.value = null
+    setDrawer('select')
+    if (route.path !== '/') router.push('/')
   }
-  await loadSessions()
-  currentId.value = s.id
-  menuOpenId.value = null
-  setDrawer('select')
-  if (route.path !== '/') router.push('/')
 }
 
 function onSelect(s) {

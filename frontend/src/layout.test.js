@@ -11,6 +11,7 @@ import {
 
 const srcDir = dirname(fileURLToPath(import.meta.url))
 const appShell = readFileSync(join(srcDir, 'components/AppShell.vue'), 'utf8')
+const composer = readFileSync(join(srcDir, 'components/Composer.vue'), 'utf8')
 const styles = readFileSync(join(srcDir, 'styles.css'), 'utf8')
 
 function scriptSetup(source) {
@@ -141,5 +142,64 @@ describe('narrow drawer settings and more-menu opacity', () => {
   it('shows the more action at full opacity on narrow', () => {
     const media = styles.slice(styles.indexOf('@media (max-width: 719.98px)'))
     expect(media).toMatch(/\.session-list \.session-actions\.menu \{[\s\S]*?opacity:\s*1;/)
+  })
+})
+
+describe('/new-session intercept', () => {
+  it('Composer parses the command before the modelId check and emits empty files', () => {
+    const body = functionBody(scriptSetup(composer), 'onSend')
+    expect(body).toBeTruthy()
+    const parseIdx = body.indexOf('parseNewSessionCommand')
+    const modelIdx = body.indexOf('props.modelId')
+    expect(parseIdx).toBeGreaterThan(-1)
+    expect(modelIdx).toBeGreaterThan(-1)
+    expect(parseIdx).toBeLessThan(modelIdx)
+    expect(body.slice(parseIdx, modelIdx)).toContain('files: []')
+  })
+
+  it('AppShell onComposerSend routes the command to onNewChat without sending to the view', () => {
+    const body = functionBody(scriptSetup(appShell), 'onComposerSend')
+    expect(body).toBeTruthy()
+    expect(body.trim().startsWith('const cmd = parseNewSessionCommand')).toBe(true)
+    const newChatIdx = body.indexOf('onNewChat')
+    const retIdx = body.indexOf('return', newChatIdx)
+    expect(newChatIdx).toBeGreaterThan(-1)
+    expect(retIdx).toBeGreaterThan(newChatIdx)
+    expect(body.slice(0, retIdx)).not.toContain('viewRef.value?.send')
+  })
+
+  it('onNewChat PATCHes a truthy title and still selects if PATCH throws', () => {
+    const body = functionBody(scriptSetup(appShell), 'onNewChat')
+    expect(body).toBeTruthy()
+    const createIdx = body.indexOf('createSession')
+    const tryIdx = body.indexOf('try')
+    const catchIdx = body.indexOf('catch')
+    const finallyIdx = body.indexOf('finally')
+    expect(createIdx).toBeGreaterThan(-1)
+    expect(tryIdx).toBeGreaterThan(createIdx)
+    expect(catchIdx).toBeGreaterThan(tryIdx)
+    expect(finallyIdx).toBeGreaterThan(catchIdx)
+    const titleGuard = body.match(/if \(title\) \{[\s\S]*?\}/)
+    expect(titleGuard).toBeTruthy()
+    expect(titleGuard[0]).toContain('patchSession')
+    expect(titleGuard[0]).toContain('title.slice(0, 128)')
+    expect(body.slice(0, tryIdx)).not.toContain('patchSession')
+    expect(body).toMatch(/alert\(e\.message \|\| ['']设置标题失败['']\)/)
+    const finallyBody = body.slice(finallyIdx)
+    expect(finallyBody).toContain('loadSessions')
+    expect(finallyBody).toContain('currentId.value = s.id')
+    expect(finallyBody).toContain("setDrawer('select')")
+  })
+})
+
+describe('narrow session menu trigger', () => {
+  it('keeps the last media query and sizes the menu icon-btn to 44px', () => {
+    const mediaIdx = styles.indexOf('@media (max-width: 719.98px)')
+    expect(mediaIdx).toBeGreaterThan(-1)
+    expect(styles.lastIndexOf('@media')).toBe(mediaIdx)
+    const media = styles.slice(mediaIdx)
+    expect(media).toMatch(
+      /\.session-list \.session-actions\.menu \.icon-btn \{[\s\S]*?width:\s*44px;[\s\S]*?height:\s*44px;/,
+    )
   })
 })

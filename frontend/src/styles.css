@@ -1405,6 +1405,11 @@ textarea {
     opacity: 1;
   }
 
+  .session-list .session-actions.menu .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
   .more-btn {
     width: 44px;
     height: 44px;
