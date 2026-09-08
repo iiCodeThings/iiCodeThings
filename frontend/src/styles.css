@@ -145,7 +145,6 @@ textarea {
 }
 
 .login button,
-.new-chat,
 .send-btn,
 .model-form button,
 .password-form button,
@@ -162,7 +161,6 @@ textarea {
 }
 
 .login button:hover,
-.new-chat:hover,
 .send-btn:hover,
 .model-form button:hover,
 .password-form button:hover,
@@ -207,10 +205,6 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-}
-
-.new-chat {
-  width: 100%;
 }
 
 .session-list {
@@ -289,7 +283,7 @@ textarea {
 }
 
 .session-actions.menu {
-  display: none;
+  display: flex;
   position: relative;
 }
 
@@ -329,18 +323,6 @@ textarea {
 
 .session-menu button.danger {
   color: var(--danger);
-}
-
-.more-session {
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-  color: var(--pine);
-  font: inherit;
-  font-size: 0.78rem;
-  padding: 0.35rem 0.4rem;
-  min-height: 44px;
-  cursor: pointer;
 }
 
 .session-list li:hover .session-actions,
@@ -1349,13 +1331,6 @@ textarea {
     font-weight: 600;
   }
 
-  .chat-topbar .new-chat {
-    width: auto;
-    flex-shrink: 0;
-    padding: 0.4rem 0.7rem;
-    min-height: 44px;
-  }
-
   .chat-topbar .icon-btn {
     width: 44px;
     height: 44px;
@@ -1423,10 +1398,6 @@ textarea {
 
   .think-toggle {
     min-height: 44px;
-  }
-
-  .session-list .session-actions.icons {
-    display: none;
   }
 
   .session-list .session-actions.menu {

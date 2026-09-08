@@ -51,9 +51,9 @@ describe('NARROW_QUERY', () => {
 })
 
 describe('sessionActionsMode', () => {
-  it('uses a more menu on narrow, icons on desktop', () => {
+  it('always uses the menu', () => {
     expect(sessionActionsMode(true)).toBe('menu')
-    expect(sessionActionsMode(false)).toBe('icons')
+    expect(sessionActionsMode(false)).toBe('menu')
   })
 })
 
@@ -74,16 +74,15 @@ describe('nextDrawerOpen', () => {
   })
 })
 
-describe('narrow session more menu', () => {
-  it('keeps icon buttons on desktop and a more-session button on narrow', () => {
-    expect(appShell).toContain("v-if=\"sessionActionsMode(narrow) === 'icons'\"")
-    expect(appShell).toContain('class="session-actions icons"')
+describe('session actions menu', () => {
+  it('uses a single menu with the three-line icon and no icon row or 新对话 buttons', () => {
+    expect(appShell).not.toContain('session-actions icons')
+    expect(appShell).not.toContain('>新对话<')
     expect(appShell).toContain('class="session-actions menu"')
-    const moreBtn = appShell.match(/class="more-session"[\s\S]*?<\/button>/)
-    expect(moreBtn).toBeTruthy()
-    expect(moreBtn[0]).toContain('aria-label="更多"')
-    expect(moreBtn[0]).toMatch(/>\s*更多\s*</)
-    expect(moreBtn[0]).not.toContain('icon-btn')
+    expect(appShell).toContain('aria-label="会话操作"')
+    expect(appShell).toContain('name="menu"')
+    expect(appShell).not.toContain('class="more-session"')
+    expect(appShell).not.toMatch(/>\s*更多\s*</)
   })
 
   it('lists pin, rename, share, AI title, and delete in the more menu', () => {
@@ -105,26 +104,6 @@ describe('narrow session more menu', () => {
       expect(body, name).toBeTruthy()
       expect(body.trim().split('\n')[0].trim(), name).toBe('menuOpenId.value = null')
     }
-  })
-
-  it('defines .more-session outside the narrow media query', () => {
-    const rule = `.more-session {
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-  color: var(--pine);
-  font: inherit;
-  font-size: 0.78rem;
-  padding: 0.35rem 0.4rem;
-  min-height: 44px;
-  cursor: pointer;
-}`
-    expect(styles).toContain(rule)
-    const ruleIdx = styles.indexOf('.more-session {')
-    const mediaIdx = styles.indexOf('@media (max-width: 719.98px)')
-    expect(ruleIdx).toBeGreaterThan(-1)
-    expect(mediaIdx).toBeGreaterThan(-1)
-    expect(ruleIdx).toBeLessThan(mediaIdx)
   })
 
   it('unclips the session list while a more menu is open', () => {

@@ -12,7 +12,7 @@ import {
   shareSession,
   unpinSession,
 } from '../api.js'
-import { NARROW_QUERY, nextDrawerOpen, sessionActionsMode } from '../layout.js'
+import { NARROW_QUERY, nextDrawerOpen } from '../layout.js'
 import { explainRetitleResult } from '../retitleFeedback.js'
 import { copySharePath } from '../shareLink.js'
 import Icon from './Icons.vue'
@@ -267,7 +267,6 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           <span class="brand-mark" aria-hidden="true"></span>
           <span class="brand-name">对话</span>
         </div>
-        <button type="button" class="new-chat" @click="onNewChat">新对话</button>
         <ul class="session-list" :class="{ 'menu-open': menuOpenId != null }">
           <li
             v-for="s in sessions"
@@ -277,55 +276,15 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           >
             <div class="session-head">
               <span class="session-title" :title="s.title">{{ s.title }}</span>
-              <span v-if="sessionActionsMode(narrow) === 'icons'" class="session-actions icons">
-                <button
-                  v-if="s.pinned"
-                  type="button"
-                  class="icon-btn"
-                  title="取消置顶"
-                  aria-label="取消置顶"
-                  @click="onUnpin(s, $event)"
-                >
-                  <Icon name="unpin" />
-                </button>
-                <button type="button" class="icon-btn" title="置顶" aria-label="置顶" @click="onPin(s, $event)">
-                  <Icon name="pin" />
-                </button>
-                <button type="button" class="icon-btn" title="重命名" aria-label="重命名" @click="onRename(s, $event)">
-                  <Icon name="quill" />
-                </button>
+              <span class="session-actions menu">
                 <button
                   type="button"
                   class="icon-btn"
-                  title="分享会话"
-                  aria-label="分享会话"
-                  @click="onShareSession(s, $event)"
-                >
-                  <Icon name="link" />
-                </button>
-                <button
-                  type="button"
-                  class="icon-btn"
-                  title="用 AI 生成标题"
-                  aria-label="用 AI 生成标题"
-                  :disabled="retitlingId != null"
-                  @click="onAiTitle(s, $event)"
-                >
-                  <span v-if="retitlingId === s.id" class="msg-spinner" aria-hidden="true"></span>
-                  <Icon v-else name="spark" />
-                </button>
-                <button type="button" class="icon-btn danger" title="删除" aria-label="删除" @click="onDelete(s, $event)">
-                  <Icon name="inkx" />
-                </button>
-              </span>
-              <span v-else class="session-actions menu">
-                <button
-                  type="button"
-                  class="more-session"
-                  aria-label="更多"
+                  aria-label="会话操作"
+                  title="会话操作"
                   @click.stop="menuOpenId = menuOpenId === s.id ? null : s.id"
                 >
-                  更多
+                  <Icon name="menu" />
                 </button>
                 <ul v-if="menuOpenId === s.id" class="session-menu">
                   <li>
@@ -369,7 +328,6 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           <Icon name="menu" />
         </button>
         <span class="topbar-title">{{ currentTitle }}</span>
-        <button type="button" class="new-chat" @click="onNewChat">新对话</button>
       </header>
       <RouterView v-slot="{ Component }">
         <component

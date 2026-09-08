@@ -4,8 +4,8 @@ export function isNarrowViewport(widthPx) {
   return Number(widthPx) < 720
 }
 
-export function sessionActionsMode(narrow) {
-  return narrow ? 'menu' : 'icons'
+export function sessionActionsMode(_narrow) {
+  return 'menu'
 }
 
 export function nextDrawerOpen({ open, narrow, action }) {
