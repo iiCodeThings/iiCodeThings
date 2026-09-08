@@ -214,4 +214,19 @@ defineProps({
       stroke-linecap="round"
     />
   </svg>
+
+  <svg
+    v-else-if="name === 'menu'"
+    class="icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M5 7h14M5 12h14M5 17h14"
+      stroke="currentColor"
+      stroke-width="1.55"
+      stroke-linecap="round"
+    />
+  </svg>
 </template>

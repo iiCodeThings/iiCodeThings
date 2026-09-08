@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import {
   createSession,
@@ -12,6 +12,7 @@ import {
   shareSession,
   unpinSession,
 } from '../api.js'
+import { NARROW_QUERY, nextDrawerOpen, sessionActionsMode } from '../layout.js'
 import { explainRetitleResult } from '../retitleFeedback.js'
 import { copySharePath } from '../shareLink.js'
 import Icon from './Icons.vue'
@@ -33,10 +34,56 @@ const models = ref([])
 const selectedModelId = ref('')
 const viewRef = ref(null)
 const retitlingId = ref(null)
+const narrow = ref(false)
+const drawerOpen = ref(false)
+const menuOpenId = ref(null)
 
 const modelId = computed(() =>
   selectedModelId.value === '' ? null : Number(selectedModelId.value),
 )
+
+const currentTitle = computed(() => {
+  const row = sessions.value.find((s) => s.id === currentId.value)
+  return row?.title || '对话'
+})
+
+function setDrawer(action) {
+  drawerOpen.value = nextDrawerOpen({
+    open: drawerOpen.value,
+    narrow: narrow.value,
+    action,
+  })
+}
+
+function onHamburger() {
+  setDrawer('toggle')
+}
+
+function onBackdrop() {
+  setDrawer('backdrop')
+}
+
+function onDrawerKey(e) {
+  if (e.key === 'Escape') {
+    setDrawer('escape')
+    menuOpenId.value = null
+  }
+}
+
+function onDocPointer(e) {
+  if (menuOpenId.value == null) return
+  const el = e.target
+  if (el && typeof el.closest === 'function' && el.closest('.session-actions.menu')) return
+  menuOpenId.value = null
+}
+
+let narrowMq = null
+
+function applyNarrow() {
+  if (!narrowMq) return
+  narrow.value = narrowMq.matches
+  if (!narrowMq.matches) setDrawer('widen')
+}
 
 async function loadSessions() {
   sessions.value = await listSessions()
@@ -58,11 +105,15 @@ async function onNewChat() {
   const s = await createSession()
   await loadSessions()
   currentId.value = s.id
+  menuOpenId.value = null
+  setDrawer('select')
   if (route.path !== '/') router.push('/')
 }
 
 function onSelect(s) {
   currentId.value = s.id
+  menuOpenId.value = null
+  setDrawer('select')
   if (route.path !== '/') router.push('/')
 }
 
@@ -161,6 +212,22 @@ onMounted(async () => {
   } catch {
     /* 401 redirects via jsonFetch */
   }
+  narrowMq = window.matchMedia(NARROW_QUERY)
+  applyNarrow()
+  narrowMq.addEventListener('change', applyNarrow)
+  window.addEventListener('keydown', onDrawerKey)
+  document.addEventListener('pointerdown', onDocPointer)
+})
+
+onUnmounted(() => {
+  if (narrowMq) narrowMq.removeEventListener('change', applyNarrow)
+  window.removeEventListener('keydown', onDrawerKey)
+  document.removeEventListener('pointerdown', onDocPointer)
+  document.body.style.overflow = ''
+})
+
+watch([drawerOpen, narrow], ([open, isNarrow]) => {
+  document.body.style.overflow = open && isNarrow ? 'hidden' : ''
 })
 
 watch(
@@ -180,7 +247,14 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
 </script>
 
 <template>
-  <div class="shell">
+  <div class="shell" :class="{ 'drawer-open': drawerOpen && narrow }">
+    <button
+      v-show="narrow && drawerOpen"
+      type="button"
+      class="drawer-backdrop"
+      aria-label="关闭会话列表"
+      @click="onBackdrop"
+    ></button>
     <aside class="left">
       <div class="nav">
         <div class="brand">
@@ -254,6 +328,13 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
       </div>
     </aside>
     <main class="right">
+      <header class="chat-topbar">
+        <button type="button" class="icon-btn" aria-label="会话列表" @click="onHamburger">
+          <Icon name="menu" />
+        </button>
+        <span class="topbar-title">{{ currentTitle }}</span>
+        <button type="button" class="new-chat" @click="onNewChat">新对话</button>
+      </header>
       <RouterView v-slot="{ Component }">
         <component
           :is="Component"
