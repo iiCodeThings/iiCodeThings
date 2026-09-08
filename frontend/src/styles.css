@@ -550,6 +550,15 @@ textarea {
     padding-top: 1.6rem;
     padding-bottom: 2.2rem;
   }
+
+  .search-omnibox {
+    font-size: 1rem;
+  }
+
+  .message-pane {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
 }
 
 .right {

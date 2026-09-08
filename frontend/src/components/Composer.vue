@@ -55,7 +55,7 @@ defineExpose({ content, files, onSend })
     <div class="composer-box">
       <textarea
         v-model="content"
-        rows="3"
+        rows="2"
         placeholder="输入消息…"
         aria-label="消息输入"
         @keydown="onKeydown"
