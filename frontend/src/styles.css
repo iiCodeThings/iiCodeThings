@@ -187,6 +187,7 @@ textarea {
 .shell {
   display: flex;
   height: 100vh;
+  height: 100dvh;
 }
 
 .left {
@@ -283,6 +284,49 @@ textarea {
   opacity: 0.55;
 }
 
+.session-actions.menu {
+  display: none;
+  position: relative;
+}
+
+.session-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 4;
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  min-width: 9.5rem;
+  background: var(--cream);
+  border: 1px solid var(--paper-line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.session-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 0.55rem 0.8rem;
+  min-height: 44px;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.session-menu button:hover,
+.session-menu button:focus {
+  background: rgba(36, 85, 68, 0.08);
+}
+
+.session-menu button.danger {
+  color: var(--danger);
+}
+
 .session-list li:hover .session-actions,
 .session-list li.active .session-actions,
 .session-list li:focus-within .session-actions {
@@ -358,6 +402,142 @@ textarea {
 .settings-link.router-link-active {
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+.chat-topbar {
+  display: none;
+}
+
+.drawer-backdrop {
+  display: none;
+}
+
+@media (max-width: 719.98px) {
+  .chat-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-shrink: 0;
+    min-height: 48px;
+    padding: 0.45rem 0.75rem;
+    padding-top: calc(0.45rem + env(safe-area-inset-top, 0px));
+    padding-left: calc(0.75rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(0.75rem + env(safe-area-inset-right, 0px));
+    border-bottom: 1px solid var(--paper-line);
+    background: var(--paper);
+  }
+
+  .chat-topbar .topbar-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .chat-topbar .new-chat {
+    width: auto;
+    flex-shrink: 0;
+    padding: 0.4rem 0.7rem;
+    min-height: 44px;
+  }
+
+  .chat-topbar .icon-btn {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+
+  .drawer-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    border: 0;
+    padding: 0;
+    background: rgba(28, 46, 38, 0.35);
+  }
+
+  .shell.drawer-open .drawer-backdrop {
+    display: block;
+  }
+
+  .left {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(292px, 86vw);
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    box-shadow: none;
+  }
+
+  .shell.drawer-open .left {
+    transform: translateX(0);
+    box-shadow: 8px 0 28px rgba(36, 42, 34, 0.18);
+  }
+
+  .right {
+    width: 100%;
+    flex: 1;
+  }
+
+  .composer {
+    padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(0.75rem + env(safe-area-inset-left, 0px));
+    padding-right: calc(0.75rem + env(safe-area-inset-right, 0px));
+  }
+
+  .composer-box textarea {
+    min-height: 2.6rem;
+  }
+
+  .composer-actions {
+    flex-wrap: wrap;
+  }
+
+  .icon-btn.attach,
+  .send-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .think-toggle {
+    min-height: 44px;
+  }
+
+  .session-list .session-actions.icons {
+    display: none;
+  }
+
+  .session-list .session-actions.menu {
+    display: flex;
+  }
+
+  .more-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .login-page,
+  .settings,
+  .search-page,
+  .share-page {
+    padding-left: max(0.9rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.9rem, env(safe-area-inset-right, 0px));
+  }
+
+  .share-article {
+    padding-top: 1.6rem;
+    padding-bottom: 2.2rem;
+  }
 }
 
 .right {
