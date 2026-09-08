@@ -14,6 +14,7 @@ import {
 } from '../api.js'
 import { NARROW_QUERY, nextDrawerOpen } from '../layout.js'
 import { parseNewSessionCommand } from '../newSessionCommand.js'
+import { parseSearchCommand } from '../slashCommands.js'
 import { explainRetitleResult } from '../retitleFeedback.js'
 import { copySharePath } from '../shareLink.js'
 import Icon from './Icons.vue'
@@ -202,6 +203,10 @@ async function onComposerSend({ content, files, enableThinking }) {
   const cmd = parseNewSessionCommand(content)
   if (cmd) {
     await onNewChat(cmd.title)
+    return
+  }
+  if (parseSearchCommand(content)) {
+    await router.push('/search')
     return
   }
   if (!modelId.value) {

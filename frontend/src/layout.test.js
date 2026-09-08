@@ -145,16 +145,41 @@ describe('narrow drawer settings and more-menu opacity', () => {
   })
 })
 
+describe('slash command autocomplete', () => {
+  it('renders a listbox of slash suggestions above the textarea', () => {
+    expect(composer).toContain('class="slash-suggest"')
+    expect(composer).toContain('role="listbox"')
+    expect(composer).toContain('role="option"')
+    expect(composer).toContain('aria-expanded')
+    expect(composer).toContain('completeSlashCommand')
+    expect(composer).toContain("e.key === 'ArrowDown'")
+    expect(composer).toContain("e.key === 'ArrowUp'")
+    expect(composer).toContain("e.key === 'Escape'")
+    expect(composer).toContain('mousedown.prevent')
+  })
+
+  it('places slash-suggest CSS above the composer box', () => {
+    expect(styles).toContain('.composer-box {')
+    expect(styles).toMatch(/\.composer-box \{[\s\S]*?position:\s*relative;/)
+    expect(styles).toContain('.slash-suggest {')
+    expect(styles).toMatch(/\.slash-suggest \{[\s\S]*?bottom:\s*100%;/)
+  })
+})
+
 describe('/new-session intercept', () => {
   it('Composer parses the command before the modelId check and emits empty files', () => {
     const body = functionBody(scriptSetup(composer), 'onSend')
     expect(body).toBeTruthy()
     const parseIdx = body.indexOf('parseNewSessionCommand')
+    const searchIdx = body.indexOf('parseSearchCommand')
     const modelIdx = body.indexOf('props.modelId')
     expect(parseIdx).toBeGreaterThan(-1)
+    expect(searchIdx).toBeGreaterThan(-1)
     expect(modelIdx).toBeGreaterThan(-1)
     expect(parseIdx).toBeLessThan(modelIdx)
+    expect(searchIdx).toBeLessThan(modelIdx)
     expect(body.slice(parseIdx, modelIdx)).toContain('files: []')
+    expect(body.slice(searchIdx, modelIdx)).toContain('files: []')
   })
 
   it('AppShell onComposerSend routes the command to onNewChat without sending to the view', () => {
@@ -166,6 +191,21 @@ describe('/new-session intercept', () => {
     expect(newChatIdx).toBeGreaterThan(-1)
     expect(retIdx).toBeGreaterThan(newChatIdx)
     expect(body.slice(0, retIdx)).not.toContain('viewRef.value?.send')
+  })
+
+  it('AppShell onComposerSend routes /search before the model check and does not send', () => {
+    const body = functionBody(scriptSetup(appShell), 'onComposerSend')
+    expect(body).toBeTruthy()
+    const searchIdx = body.indexOf('parseSearchCommand')
+    const modelIdx = body.indexOf('modelId.value')
+    const sendIdx = body.indexOf('viewRef.value?.send')
+    expect(searchIdx).toBeGreaterThan(-1)
+    expect(modelIdx).toBeGreaterThan(-1)
+    expect(searchIdx).toBeLessThan(modelIdx)
+    expect(body.slice(searchIdx, modelIdx)).toContain("router.push('/search')")
+    expect(body.slice(searchIdx, modelIdx)).toContain('return')
+    expect(body.slice(searchIdx, modelIdx)).not.toContain('viewRef.value?.send')
+    expect(sendIdx).toBeGreaterThan(modelIdx)
   })
 
   it('onNewChat PATCHes a truthy title and still selects if PATCH throws', () => {
