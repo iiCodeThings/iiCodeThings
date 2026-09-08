@@ -118,18 +118,21 @@ function onSelect(s) {
 }
 
 async function onPin(s, ev) {
+  menuOpenId.value = null
   ev.stopPropagation()
   await pinSession(s.id)
   await loadSessions()
 }
 
 async function onUnpin(s, ev) {
+  menuOpenId.value = null
   ev.stopPropagation()
   await unpinSession(s.id)
   await loadSessions()
 }
 
 async function onRename(s, ev) {
+  menuOpenId.value = null
   ev.stopPropagation()
   const next = window.prompt('重命名会话', s.title)
   if (next == null) return
@@ -140,6 +143,7 @@ async function onRename(s, ev) {
 }
 
 async function onShareSession(s, ev) {
+  menuOpenId.value = null
   ev.stopPropagation()
   try {
     const result = await shareSession(s.id)
@@ -151,6 +155,7 @@ async function onShareSession(s, ev) {
 }
 
 async function onAiTitle(s, ev) {
+  menuOpenId.value = null
   ev.stopPropagation()
   if (!modelId.value) {
     alert('请先在设置中添加模型')
@@ -174,6 +179,7 @@ async function onAiTitle(s, ev) {
 }
 
 async function onDelete(s, ev) {
+  menuOpenId.value = null
   ev.stopPropagation()
   if (!window.confirm(`删除会话「${s.title}」？`)) return
   await deleteSession(s.id)
@@ -271,7 +277,7 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
           >
             <div class="session-head">
               <span class="session-title" :title="s.title">{{ s.title }}</span>
-              <span class="session-actions">
+              <span v-if="sessionActionsMode(narrow) === 'icons'" class="session-actions icons">
                 <button
                   v-if="s.pinned"
                   type="button"
@@ -311,6 +317,36 @@ defineExpose({ loadSessions, loadModels, currentId, modelId })
                 <button type="button" class="icon-btn danger" title="删除" aria-label="删除" @click="onDelete(s, $event)">
                   <Icon name="inkx" />
                 </button>
+              </span>
+              <span v-else class="session-actions menu">
+                <button
+                  type="button"
+                  class="more-session"
+                  aria-label="更多"
+                  @click.stop="menuOpenId = menuOpenId === s.id ? null : s.id"
+                >
+                  更多
+                </button>
+                <ul v-if="menuOpenId === s.id" class="session-menu">
+                  <li>
+                    <button v-if="s.pinned" type="button" @click="onUnpin(s, $event)">取消置顶</button>
+                    <button v-else type="button" @click="onPin(s, $event)">置顶</button>
+                  </li>
+                  <li>
+                    <button type="button" @click="onRename(s, $event)">重命名</button>
+                  </li>
+                  <li>
+                    <button type="button" @click="onShareSession(s, $event)">分享会话</button>
+                  </li>
+                  <li>
+                    <button type="button" :disabled="retitlingId != null" @click="onAiTitle(s, $event)">
+                      用 AI 生成标题
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" class="danger" @click="onDelete(s, $event)">删除</button>
+                  </li>
+                </ul>
               </span>
             </div>
             <span v-if="s.updated_at" class="session-time">{{ formatTime(s.updated_at) }}</span>

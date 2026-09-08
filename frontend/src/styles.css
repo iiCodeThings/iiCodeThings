@@ -327,6 +327,18 @@ textarea {
   color: var(--danger);
 }
 
+.more-session {
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pine);
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.4rem;
+  min-height: 44px;
+  cursor: pointer;
+}
+
 .session-list li:hover .session-actions,
 .session-list li.active .session-actions,
 .session-list li:focus-within .session-actions {
