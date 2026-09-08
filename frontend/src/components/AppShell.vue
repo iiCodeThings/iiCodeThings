@@ -13,6 +13,7 @@ import {
   unpinSession,
 } from '../api.js'
 import { NARROW_QUERY, nextDrawerOpen } from '../layout.js'
+import { parseNewSessionCommand } from '../newSessionCommand.js'
 import { explainRetitleResult } from '../retitleFeedback.js'
 import { copySharePath } from '../shareLink.js'
 import Icon from './Icons.vue'
@@ -101,8 +102,11 @@ async function loadModels() {
   }
 }
 
-async function onNewChat() {
+async function onNewChat(title) {
   const s = await createSession()
+  if (title) {
+    await patchSession(s.id, title.slice(0, 128))
+  }
   await loadSessions()
   currentId.value = s.id
   menuOpenId.value = null
@@ -190,6 +194,11 @@ async function onDelete(s, ev) {
 }
 
 async function onComposerSend({ content, files, enableThinking }) {
+  const cmd = parseNewSessionCommand(content)
+  if (cmd) {
+    await onNewChat(cmd.title)
+    return
+  }
   if (!modelId.value) {
     alert('请先在设置中添加模型')
     return

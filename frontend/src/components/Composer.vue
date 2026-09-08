@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { acceptAttr } from '../api.js'
 import { shouldSendOnKeydown } from '../composerKeys.js'
+import { parseNewSessionCommand } from '../newSessionCommand.js'
 import Icon from './Icons.vue'
 
 const props = defineProps({
@@ -27,11 +28,18 @@ function onFileChange(e) {
 }
 
 function onSend() {
+  const text = content.value
+  if (parseNewSessionCommand(text)) {
+    emit('send', { content: text, files: [], enableThinking: enableThinking.value })
+    content.value = ''
+    files.value = null
+    if (fileInput.value) fileInput.value.value = ''
+    return
+  }
   if (!props.modelId) {
     alert('请先在设置中添加模型')
     return
   }
-  const text = content.value
   const fileList = files.value
   if (!text.trim() && (!fileList || fileList.length === 0)) return
   const snapshot = fileList ? [...fileList] : []
